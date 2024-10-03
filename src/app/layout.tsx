@@ -5,8 +5,8 @@ import '@mantine/core/styles.css'
 import { Providers } from '@/components/providers'
 
 export const metadata: Metadata = {
-    title: 'SafeInsights App Template',
-    description: 'An application',
+    title: 'SafeInsights - TOA',
+    description: 'SafeInsights - Trusted Output Application',
 }
 
 export default function RootLayout({
