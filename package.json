@@ -1,7 +1,7 @@
 {
-    "name": "app-template",
+    "name": "trusted-output-app",
     "version": "0.0.1",
-    "description": "App Template",
+    "description": "Trusted Output App",
     "main": "index.js",
     "scripts": {
         "dev": "next dev",
