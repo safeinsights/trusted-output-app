@@ -15,7 +15,6 @@
         "test:unit": "vitest",
         "test": "run-p -c test:*"
     },
-    "author": "Nathan Stitt",
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "@playwright/test": "^1.46",
