@@ -7,7 +7,6 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "start-lambda": "next start -p 3000",
         "build-docker": "docker build -t safeinsights/trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
@@ -43,6 +42,7 @@
         "@vanilla-extract/css": "^1.15",
         "@vanilla-extract/next-plugin": "^2.4",
         "clsx": "*",
+        "multer": "^1.4.5-lts.1",
         "next-swagger-doc": "^0.4"
     }
 }

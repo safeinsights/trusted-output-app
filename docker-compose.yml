@@ -1,23 +1,22 @@
 services:
-    trusted-output-app:
-        container_name: trusted-output-app
+    trusted-output:
+        container_name: trusted-output
+        # TODO Probably don't need clerk stuff in here
         environment:
             - CI=$CI
-# Will we need clerk post-pilot?
-#            - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-#            - CLERK_SECRET_KEY=$CLERK_SECRET_KEY
-#            - E2E_CLERK_USER_USERNAME=$E2E_CLERK_USER_USERNAME
-#            - E2E_CLERK_USER_PASSWORD=$E2E_CLERK_USER_PASSWORD
-            - MANAGEMENT_APP_API_URL=TODO_FIGURE_ME_OUT
+            - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+            - CLERK_SECRET_KEY=$CLERK_SECRET_KEY
+            - E2E_CLERK_USER_USERNAME=$E2E_CLERK_USER_USERNAME
+            - E2E_CLERK_USER_PASSWORD=$E2E_CLERK_USER_PASSWORD
         build:
             context: .
-            dockerfile: ./Dockerfile
+            dockerfile: ./Dockerfile.dev
         volumes:
             - ./:/app/
             - node_modules:/app/node_modules
         restart: always
         networks:
-            - mgmnt-app
+            - trusted-output
         ports:
             - 3000:3000
         healthcheck:
@@ -27,7 +26,6 @@ services:
             start_period: 30s
             timeout: 10s
 networks:
-    mgmnt-app:
+    trusted-output:
 volumes:
-    pgdata:
     node_modules:
