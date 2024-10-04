@@ -7,6 +7,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
+        "start-lambda": "next start -p 3000",
+        "build-docker": "docker build -t safeinsights/trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
         "typecheck": "tsc --noEmit",
