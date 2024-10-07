@@ -1,36 +1,34 @@
-// app/api/upload/route.ts
+import { NextRequest, NextResponse } from "next/server"
+import path from "path"
+import fs from "fs"
 
-import { NextResponse } from 'next/server'
-import multer from 'multer'
-import fs from 'fs'
-import path from 'path'
+// TODO Change this with docker and use docker storage
+//  so it dies with the container? or is this fine?
+const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? "", "public/uploads")
 
-// Configure multer for file storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(process.cwd(), 'uploads')
-        // Create the uploads directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir)
+export const POST = async (req: NextRequest) => {
+    const formData = await req.formData()
+    const body = Object.fromEntries(formData)
+    const file = (body.file as Blob) || null
+
+    if (file) {
+        const buffer = Buffer.from(await file.arrayBuffer())
+        if (!fs.existsSync(UPLOAD_DIR)) {
+            fs.mkdirSync(UPLOAD_DIR)
         }
-        cb(null, uploadDir)
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname) // Save with original filename
-    },
-})
 
-const upload = multer({ storage })
-
-export async function POST(req: Request) {
-    // Create a new Promise for multer to handle the file upload
-    return new Promise((resolve) => {
-        upload.single('file')(req as any, {} as any, (err) => {
-            if (err) {
-                return resolve(NextResponse.json({ message: 'File upload failed.' }, { status: 500 }))
-            }
-            // If file is uploaded successfully
-            return resolve(NextResponse.json({ message: 'File uploaded successfully.' }, { status: 200 }))
+        fs.writeFileSync(
+            path.resolve(UPLOAD_DIR, (body.file as File).name),
+            buffer
+        )
+    } else {
+        return NextResponse.json({
+            success: false,
         })
+    }
+
+    return NextResponse.json({
+        success: true,
+        name: (body.file as File).name,
     })
 }
