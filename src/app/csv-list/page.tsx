@@ -17,7 +17,6 @@ const CSVList = async () => {
 
     return (
         <div>
-            <h1>Upload CSV</h1>
             <h2>Uploaded CSV Files</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <ul>
