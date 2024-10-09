@@ -7,3 +7,8 @@
 - Allowing members(TM) to log in and approve the results of the code run (AKA the CSV files)
 - Once the members approve the results, this application will post the CSV file to the management app (Endpoint TBD)
 
+## To list your AWS profiles before pushing the image:
+- `aws configure list-profiles`
+## To push image to ECR
+- `aws sso login --profile your-profile`
+- `AWS_PROFILE=your-profile AWS_REGION=your-region npm run deploy:ecr`
