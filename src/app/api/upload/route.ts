@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import path from "path"
 import fs from "fs"
+import os from 'os'
 
-// TODO Change this with docker and use docker storage
-//  so it dies with the container? or is this fine?
-const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? "", "public/uploads")
+const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? os.tmpdir(), "public/uploads")
 
 export const POST = async (req: NextRequest) => {
     const formData = await req.formData()
