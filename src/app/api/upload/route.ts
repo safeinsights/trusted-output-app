@@ -1,34 +1,27 @@
-import { NextRequest, NextResponse } from "next/server"
-import path from "path"
-import fs from "fs"
-
-// TODO Change this with docker and use docker storage
-//  so it dies with the container? or is this fine?
-const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? "", "public/uploads")
+import { NextRequest, NextResponse } from 'next/server'
+import { saveFile } from '../../utils'
 
 export const POST = async (req: NextRequest) => {
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
     const file = (body.file as Blob) || null
-
+    const data = (body.data as string) || null
+    let error: string | null = 'Invalid request'
     if (file) {
-        const buffer = Buffer.from(await file.arrayBuffer())
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR)
+        try {
+            await saveFile(file, (body.file as File).name, data)
+            return NextResponse.json({
+                success: true,
+                name: (body.file as File).name,
+            })
+        } catch (err) {
+            console.error('Error saving file:', err)
+            error = `Could not save file. ${err}`
         }
-
-        fs.writeFileSync(
-            path.resolve(UPLOAD_DIR, (body.file as File).name),
-            buffer
-        )
-    } else {
-        return NextResponse.json({
-            success: false,
-        })
     }
 
     return NextResponse.json({
-        success: true,
-        name: (body.file as File).name,
+        success: false,
+        message: error,
     })
 }
