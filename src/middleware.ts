@@ -35,5 +35,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: '/((?!favicon.ico).*)',
+    matcher: '/((?!favicon.ico|api/health).*)',
 }
