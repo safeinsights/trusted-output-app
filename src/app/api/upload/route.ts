@@ -29,7 +29,5 @@ export const POST = async (req: NextRequest) => {
         })
     }
 
-    return NextResponse.json({
-        success: false,
-    })
+    return NextResponse.next({status: 400})
 }
