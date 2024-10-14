@@ -2,9 +2,9 @@ import path from 'path'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(process.cwd(), 'public/uploads')
+export const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(process.cwd(), 'public/uploads')
 
-const createUploadDirIfNotExists = async () => {
+export const createUploadDirIfNotExists = async () => {
     try {
         if (!fs.existsSync(UPLOAD_DIR)) {
             fs.mkdirSync(UPLOAD_DIR)
@@ -14,7 +14,7 @@ const createUploadDirIfNotExists = async () => {
     }
 }
 
-const listFiles = async () => {
+export const listFiles = async () => {
     let files: string[] = []
     let error: string | null = null
     await createUploadDirIfNotExists()
@@ -29,7 +29,7 @@ const listFiles = async () => {
     return { files, error }
 }
 
-const loadMetadata = async () => {
+export const loadMetadata = async () => {
     let metadata : any = []
     let metadataPath = path.resolve(UPLOAD_DIR, `metadata.json`)
     if (fs.existsSync(metadataPath)) {
@@ -38,12 +38,12 @@ const loadMetadata = async () => {
     return metadata
 }
 
-const getFileExtension = (filename: string) => {
+export const getFileExtension = (filename: string) => {
     const parts = filename.split('.')
     return parts.length > 1 ? parts.pop()?.toUpperCase() : "N/A"
 }
 
-const saveMetadata = async (file: Blob, name: string, time: string, generatedName: string, data: any ) => {
+export const saveMetadata = async (file: Blob, name: string, time: string, generatedName: string, data: any ) => {
     let info = JSON.parse(data) || undefined
 
     const uploaded_metadata = {
@@ -67,7 +67,7 @@ const saveMetadata = async (file: Blob, name: string, time: string, generatedNam
     return metadata
 }
 
-const saveFile = async (file: Blob, name: string, data: any) => {
+export const saveFile = async (file: Blob, name: string, data: any) => {
     let randomName = uuidv4()
     await createUploadDirIfNotExists()
     await saveMetadata(file, name, new Date().toISOString(), randomName, data)
@@ -79,7 +79,7 @@ const saveFile = async (file: Blob, name: string, data: any) => {
     }
 }
 
-const parseCSV = (data: string) => {
+export const parseCSV = (data: string) => {
     let lines = data.split('\n')
     let headers = lines[0].split(';')
     let result = []
@@ -97,7 +97,7 @@ const parseCSV = (data: string) => {
     }
 }
 
-const parseData = (metadata:any, data: string, filename:string) => {
+export const parseData = (metadata:any, data: string, filename:string) => {
     let props = metadata.find((file:any) => file.savedFile === filename)
     if (props?.fileType === 'CSV') {
         return parseCSV(data)
@@ -105,7 +105,7 @@ const parseData = (metadata:any, data: string, filename:string) => {
     return data
 }
 
-const loadResearchForReview = async (savedFileName: string) => {
+export const loadResearchForReview = async (savedFileName: string) => {
     let result: string = "The Research Results are not available"
     let filePath = path.resolve(UPLOAD_DIR, savedFileName)
     if (fs.existsSync(filePath)) {
@@ -113,7 +113,7 @@ const loadResearchForReview = async (savedFileName: string) => {
     }
     return parseData(await loadMetadata(), result, savedFileName)
 }
-const approveReasearch = async (savedFileName: string) => {
+export const approveReasearch = async (savedFileName: string) => {
     console.log('Approving research:', savedFileName)
     let metadata = await loadMetadata()
     let file = metadata.find((file:any) => file.savedFile === savedFileName)
@@ -127,5 +127,3 @@ const approveReasearch = async (savedFileName: string) => {
         console.error('Error writing metadata:', err)
     }
 }
-
-export { UPLOAD_DIR, listFiles, createUploadDirIfNotExists, saveFile, loadMetadata, loadResearchForReview, approveReasearch }
