@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import os from 'os'
 
-export const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? os.tmpdir(), 'public/uploads')
+export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
 export const createUploadDirIfNotExists = async () => {
     try {

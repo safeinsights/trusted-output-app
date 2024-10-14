@@ -6,8 +6,6 @@ import fs from 'fs'
 import { rm } from 'fs/promises'
 import { UPLOAD_DIR } from '@/app/utils' // for cleanup
 
-// const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
-
 // Ensure the upload directory exists
 beforeEach(() => {
     if (!fs.existsSync(UPLOAD_DIR)) {
@@ -60,7 +58,7 @@ describe('POST /api/run/[runId]/upload', () => {
         const req = {
             formData: async () => formData,
         } as NextRequest
-        const params = { runId: 123 }
+        const params = { runId: '123' }
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
     })

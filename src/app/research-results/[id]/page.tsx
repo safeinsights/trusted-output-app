@@ -1,7 +1,7 @@
-import { loadMetadata, approveResearch, UPLOAD_DIR } from '../../utils'
+import { approveResearch, loadMetadata } from '../../utils'
 import Link from 'next/link'
 
-const ResearchResultList = async (props: any) => {
+export default async function ResearchResultList(props: any) {
     let id = props?.params.id
     if (id && id.startsWith('approve-')) {
         await approveResearch(id.substring(8))
@@ -43,4 +43,3 @@ const ResearchResultList = async (props: any) => {
     )
 }
 
-export default ResearchResultList
