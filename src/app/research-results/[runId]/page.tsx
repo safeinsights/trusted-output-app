@@ -1,10 +1,13 @@
 import { approveResearch, loadMetadata } from '../../utils'
 import Link from 'next/link'
 
-export default async function ResearchResultList(props: any) {
-    let id = props?.params.id
-    if (id && id.startsWith('approve-')) {
-        await approveResearch(id.substring(8))
+interface PageParams {
+    params: { runId: string }
+}
+
+export default async function ResearchResultList({ params: { runId } }: PageParams) {
+    if (runId?.startsWith('approve-')) {
+        await approveResearch(runId.substring(8))
     }
 
     let result = await loadMetadata()
@@ -42,4 +45,3 @@ export default async function ResearchResultList(props: any) {
         </div>
     )
 }
-

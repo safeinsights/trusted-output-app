@@ -1,9 +1,13 @@
 import { loadResearchForReview } from '../../utils'
 import Link from 'next/link'
 
-const ReviewPage = async (props: any) => {
+interface PageParams {
+    params: { runId: string }
+}
+
+const ReviewPage = async ({ params: { runId } }: PageParams) => {
     // Read the files from the disk during server-side rendering
-    const results: any = (await loadResearchForReview(props.params.id)) || undefined
+    const results: any = (await loadResearchForReview(runId)) || undefined
     const headers: any = results?.headers || []
     const data: any = results?.data || []
 
@@ -36,7 +40,9 @@ const ReviewPage = async (props: any) => {
                             looks correct Please approve by clicking below.
                         </p>
                         <button>Communicate with Researcher</button>
-                        <button><Link href={`/research-results/approve-${props.params.id}`}>Approve</Link></button>
+                        <button>
+                            <Link href={`/research-results/approve-${runId}`}>Approve</Link>
+                        </button>
                     </div>
                 </div>
             ) : (

@@ -28,6 +28,7 @@ export const getFileExtension = (filename: string) => {
     return parts.length > 1 ? parts.pop()?.toUpperCase() : 'N/A'
 }
 
+// TODO Override runID if already exists
 export const saveMetadata = async (file: Blob, name: string, runId: string) => {
     const uploaded_metadata = {
         runId: runId,
@@ -61,7 +62,6 @@ export const saveFile = async (file: Blob, name: string, runId: string) => {
 
 export const parseCSV = (data: string) => {
     let lines = data.split('\n')
-    console.log('lines: ', lines)
     let headers = lines[0].split(',')
     let result = []
     for (let i = 1; i < lines.length; i++) {
