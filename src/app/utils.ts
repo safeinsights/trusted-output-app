@@ -2,8 +2,6 @@ import path from 'path'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 
-// TODO Change this with docker and use docker storage
-//  so it dies with the container? or is this fine?
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(process.cwd(), 'public/uploads')
 
 const createUploadDirIfNotExists = async () => {
