@@ -15,4 +15,4 @@ yarn-error.log*
 .eslintcache
 coverage/
 playwright-report/
-public/uploads
+public/uploads/*

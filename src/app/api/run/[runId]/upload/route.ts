@@ -1,33 +1,27 @@
-import { NextRequest, NextResponse } from "next/server"
-import path from "path"
-import fs from "fs"
-import os from 'os'
-
-const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? os.tmpdir(), "public/uploads")
+import { NextRequest, NextResponse } from 'next/server'
+import { saveFile } from '@/app/utils'
 
 function isFile(obj: any): obj is File {
     return obj instanceof File
 }
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (req: NextRequest, {params}: { params: { runId: string } }) => {
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
+    const runId = params.runId
+
+    if (!runId) {
+        return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
+    }
 
     if ('file' in body && isFile(body.file)) {
-        const buffer = Buffer.from(await body.file.arrayBuffer())
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR)
-        }
+        await saveFile(body.file, body.file.name, runId)
 
-        fs.writeFileSync(
-          path.resolve(UPLOAD_DIR, body.file.name),
-          buffer
-        )
         return NextResponse.json({
             success: true,
             name: body.file.name,
         })
     }
 
-    return NextResponse.next({status: 400})
+    return NextResponse.next({ status: 400 })
 }
