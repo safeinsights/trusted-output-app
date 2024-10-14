@@ -54,7 +54,7 @@ export const saveFile = async (file: Blob, name: string, runId: string) => {
     await saveMetadata(file, name, runId)
     const buffer = Buffer.from(await file.arrayBuffer())
     try {
-        fs.writeFileSync(path.resolve(UPLOAD_DIR, String(runId)), buffer)
+        fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
     } catch (err) {
         console.error('Error writing file:', err)
     }

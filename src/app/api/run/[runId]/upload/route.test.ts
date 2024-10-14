@@ -26,7 +26,7 @@ describe('POST /api/run/[runId]/upload', () => {
 
         // Create a FormData object with the mock file
         const formData = new FormData()
-        formData.append('file', new File([mockFile], String(mockRunId)))
+        formData.append('file', new File([mockFile], mockRunId))
 
         // Mock the NextRequest
         const req = {
@@ -39,10 +39,10 @@ describe('POST /api/run/[runId]/upload', () => {
         const json = await response.json()
 
         expect(json.success).toBe(true)
-        expect(json.name).toBe(String(mockRunId))
+        expect(json.name).toBe(mockRunId)
 
         // Check if the file was written to the upload directory
-        const filePath = path.resolve(UPLOAD_DIR, String(mockRunId))
+        const filePath = path.resolve(UPLOAD_DIR, mockRunId)
         expect(fs.existsSync(filePath)).toBe(true)
 
         // Verify the contents of the uploaded file
