@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { POST } from '@/app/api/upload/route' // Adjust the import path
+import { POST } from '@/app/api/run/[runId]/upload/route'
 import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
@@ -20,7 +20,7 @@ afterEach(async () => {
     await rm(UPLOAD_DIR, { recursive: true, force: true })
 })
 
-describe('POST /api/upload', () => {
+describe('POST /api/run/[runId]/upload', () => {
     it('should upload a file successfully', async () => {
         // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
@@ -60,8 +60,6 @@ describe('POST /api/upload', () => {
         } as NextRequest
 
         const response = await POST(req)
-        const json = await response.json()
-
-        expect(json.success).toBe(false)
+        expect(response.status).toBe(400)
     })
 })
