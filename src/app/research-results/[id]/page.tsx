@@ -1,4 +1,4 @@
-import { loadMetadata, approveReasearch} from '../../utils'
+import { loadMetadata, approveResearch} from '../../utils'
 import Link from 'next/link'
 
 
@@ -7,7 +7,7 @@ const ResearchResultList = async (props: any) => {
     let id = props?.params.id
     console.log(id)
     if (id && id.startsWith('approve-')) {
-        await approveReasearch(id.substring(8))
+        await approveResearch(id.substring(8))
     }
     let result = await loadMetadata()
     return (

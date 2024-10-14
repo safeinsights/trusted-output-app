@@ -8,14 +8,14 @@ function isFile(obj: any): obj is File {
 export const POST = async (req: NextRequest, {params}: { params: { runId: number } }) => {
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
-    const data = (body.data as string) || null
     const runId = params.runId
+
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
     }
 
     if ('file' in body && isFile(body.file)) {
-        await saveFile(body.file, body.file.name, data)
+        await saveFile(body.file, body.file.name, runId)
 
         return NextResponse.json({
             success: true,
