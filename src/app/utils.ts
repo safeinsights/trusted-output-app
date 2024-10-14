@@ -28,7 +28,7 @@ export const getFileExtension = (filename: string) => {
     return parts.length > 1 ? parts.pop()?.toUpperCase() : 'N/A'
 }
 
-export const saveMetadata = async (file: Blob, name: string, runId: number) => {
+export const saveMetadata = async (file: Blob, name: string, runId: string) => {
     const uploaded_metadata = {
         runId: runId,
         name: name,
@@ -36,7 +36,6 @@ export const saveMetadata = async (file: Blob, name: string, runId: number) => {
         mimeType: file.type,
         time: new Date().toISOString(),
         fileType: getFileExtension(name),
-        savedFile: `${runId}.csv`,
     }
     let metadata = await loadMetadata()
     metadata.push(uploaded_metadata)
@@ -49,7 +48,7 @@ export const saveMetadata = async (file: Blob, name: string, runId: number) => {
     return metadata
 }
 
-export const saveFile = async (file: Blob, name: string, runId: number) => {
+export const saveFile = async (file: Blob, name: string, runId: string) => {
     await createUploadDirIfNotExists()
     await saveMetadata(file, name, runId)
     const buffer = Buffer.from(await file.arrayBuffer())
@@ -62,11 +61,12 @@ export const saveFile = async (file: Blob, name: string, runId: number) => {
 
 export const parseCSV = (data: string) => {
     let lines = data.split('\n')
-    let headers = lines[0].split(';')
+    console.log('lines: ', lines)
+    let headers = lines[0].split(',')
     let result = []
     for (let i = 1; i < lines.length; i++) {
         let obj: any = { tableCounter: i }
-        let currentline = lines[i].split(';')
+        let currentline = lines[i].split(',')
         for (let j = 0; j < headers.length; j++) {
             obj[headers[j]] = currentline[j]
         }
@@ -78,26 +78,26 @@ export const parseCSV = (data: string) => {
     }
 }
 
-export const parseData = (metadata: any, data: string, filename: string) => {
-    let props = metadata.find((file: any) => file.savedFile === filename)
+export const parseData = (metadata: any, data: string, runId: string) => {
+    let props = metadata.find((file: any) => file.runId === runId)
     if (props?.fileType === 'CSV') {
         return parseCSV(data)
     }
     return data
 }
 
-export const loadResearchForReview = async (savedFileName: string) => {
+export const loadResearchForReview = async (runId: string) => {
     let result: string = 'The Research Results are not available'
-    let filePath = path.resolve(UPLOAD_DIR, savedFileName)
+    let filePath = path.resolve(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
         result = fs.readFileSync(filePath, 'utf8')
     }
-    return parseData(await loadMetadata(), result, savedFileName)
+    return parseData(await loadMetadata(), result, runId)
 }
 
-export const approveResearch = async (savedFileName: string) => {
+export const approveResearch = async (runId: string) => {
     let metadata = await loadMetadata()
-    let file = metadata.find((file: any) => file.savedFile === savedFileName)
+    let file = metadata.find((file: any) => file.runId === runId)
     if (file) {
         file.status = 'Approved'
     }

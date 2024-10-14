@@ -5,7 +5,7 @@ function isFile(obj: any): obj is File {
     return obj instanceof File
 }
 
-export const POST = async (req: NextRequest, {params}: { params: { runId: number } }) => {
+export const POST = async (req: NextRequest, {params}: { params: { runId: string } }) => {
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
     const runId = params.runId

@@ -36,11 +36,11 @@ const ReviewPage = async (props: any) => {
                             looks correct Please approve by clicking below.
                         </p>
                         <button>Communicate with Researcher</button>
-                        <button><Link href={"/research-results/approve-"+props.params.id}>Approve</Link></button>
+                        <button><Link href={`/research-results/approve-${props.params.id}`}>Approve</Link></button>
                     </div>
                 </div>
             ) : (
-                <p style={{ color: 'red' }}>No Result Result found.</p>
+                <p style={{ color: 'red' }}>No result found.</p>
             )}
         </div>
     )

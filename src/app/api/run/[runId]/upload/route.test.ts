@@ -24,7 +24,7 @@ describe('POST /api/run/[runId]/upload', () => {
     it('should upload a file successfully', async () => {
         // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
-        const mockRunId = 123
+        const mockRunId = '123'
 
         // Create a FormData object with the mock file
         const formData = new FormData()
