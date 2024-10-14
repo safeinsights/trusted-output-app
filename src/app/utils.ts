@@ -115,7 +115,6 @@ export const loadResearchForReview = async (savedFileName: string) => {
     return parseData(await loadMetadata(), result, savedFileName)
 }
 export const approveReasearch = async (savedFileName: string) => {
-    console.log('Approving research:', savedFileName)
     let metadata = await loadMetadata()
     let file = metadata.find((file:any) => file.savedFile === savedFileName)
     if (file) {
