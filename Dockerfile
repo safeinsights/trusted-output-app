@@ -1,4 +1,4 @@
-FROM node:21-bookworm AS base
+FROM node:22-alpine AS base
 
 # Set the working directory inside the container
 WORKDIR /app
