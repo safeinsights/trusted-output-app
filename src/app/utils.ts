@@ -1,8 +1,9 @@
 import path from 'path'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
+import os from 'os'
 
-export const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve(process.cwd(), 'public/uploads')
+export const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? os.tmpdir(), "public/uploads")
 
 export const createUploadDirIfNotExists = async () => {
     try {
