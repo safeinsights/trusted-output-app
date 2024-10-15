@@ -14,12 +14,6 @@ services:
             - trusted-output
         ports:
             - 3000:3000
-        healthcheck:
-            test: ['CMD-SHELL', 'curl -s http://localhost:3000/api/health']
-            interval: 10s
-            retries: 5
-            start_period: 30s
-            timeout: 10s
 networks:
     trusted-output:
 volumes:
