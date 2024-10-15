@@ -7,15 +7,20 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
+        "docker:build": "docker build -t trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
         "typecheck": "tsc --noEmit",
         "checks": "run-p -c typecheck lint",
         "test:e2e": "playwright test",
         "test:unit": "vitest",
-        "test": "run-p -c test:*"
+        "test": "run-p -c test:*",
+        "ecr:login": "aws ecr get-login-password --profile $AWS_PROFILE --region $AWS_REGION | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com",
+        "ecr:create-if-needed": "aws ecr describe-repositories --repository-names trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION || aws ecr create-repository --repository-name trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION",
+        "docker:tag": "docker tag trusted-output-app:latest $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com/trusted-output-app:latest",
+        "docker:push": "docker push $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com/trusted-output-app:latest",
+        "deploy:ecr": "npm run docker:build && npm run ecr:login && npm run ecr:create-if-needed && npm run docker:tag && npm run docker:push"
     },
-    "author": "Nathan Stitt",
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "@playwright/test": "^1.46",
@@ -42,6 +47,7 @@
         "@vanilla-extract/css": "^1.15",
         "@vanilla-extract/next-plugin": "^2.4",
         "clsx": "*",
+        "multer": "^1.4.5-lts.1",
         "next-swagger-doc": "^0.4"
     }
 }
