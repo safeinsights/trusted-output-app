@@ -1,3 +1,4 @@
+import { Button, Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import { approveResearch, loadMetadata } from '../../utils'
 import Link from 'next/link'
 
@@ -11,37 +12,34 @@ export default async function ResearchResultList({ params: { runId } }: PagePara
     }
 
     let result = await loadMetadata()
+
+    const rows = result.map((file: any) => (
+        <TableTr key={file.runId}>
+            <TableTd>{file.time}</TableTd>
+            <TableTd>{file.runId}</TableTd>
+            <TableTd>{file.status || 'Pending'}</TableTd>
+            <TableTd>{file.name}</TableTd>
+            <TableTd>{file.size}</TableTd>
+            <TableTd>
+                <Button>
+                    <Link href={'/research-review/' + file.runId}>Review</Link>
+                </Button>
+            </TableTd>
+        </TableTr>
+    ))
     return (
-        <div>
-            <h2>Research Results</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Run ID</th>
-                        <th>Status</th>
-                        <th>File</th>
-                        <th>Size</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {result.map((file: any) => (
-                        <tr key={file.runId}>
-                            <td>{file.time}</td>
-                            <td>{file.runId}</td>
-                            <td>{file.status || 'Pending'}</td>
-                            <td>{file.name}</td>
-                            <td>{file.size}</td>
-                            <td>
-                                <button>
-                                    <Link href={'/research-review/' + file.runId}>Review</Link>
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <Table>
+            <TableThead>
+                <TableTr>
+                    <TableTh>Time</TableTh>
+                    <TableTh>Run ID</TableTh>
+                    <TableTh>Status</TableTh>
+                    <TableTh>File</TableTh>
+                    <TableTh>Size</TableTh>
+                    <TableTh></TableTh>
+                </TableTr>
+            </TableThead>
+            <TableTbody>{rows}</TableTbody>
+        </Table>
     )
 }
