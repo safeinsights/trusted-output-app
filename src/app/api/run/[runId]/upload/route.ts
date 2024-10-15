@@ -15,7 +15,7 @@ export const POST = async (req: NextRequest, {params}: { params: { runId: string
     }
 
     if ('file' in body && isFile(body.file)) {
-        await saveFile(body.file, body.file.name, runId)
+        await saveFile(body.file, runId)
 
         return NextResponse.json({
             success: true,

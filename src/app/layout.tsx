@@ -27,9 +27,6 @@ export default function RootLayout({
                             <Anchor component={Link} href="/">
                                 Trusted Output App
                             </Anchor>
-                            <Anchor component={Link} href="/research-results/all">
-                                Results
-                            </Anchor>
                         </Group>
                     </header>
                     {children}
