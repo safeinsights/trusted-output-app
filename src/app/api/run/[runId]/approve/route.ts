@@ -7,6 +7,7 @@ import { unlinkSync } from 'node:fs'
 //  1. Post the file to the management API
 //  2. If the management call is successful, we will delete the file from our filesystem
 //  2.a If unsuccessful - show appropriate error message?
+// To be done in https://openstax.atlassian.net/browse/SHRMP-21
 export const POST = async (req: NextRequest, { params }: { params: { runId: string } }) => {
     const runId = params.runId
 
@@ -15,7 +16,7 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     }
 
     // Delete the run file itself
-    const filePath = path.resolve(UPLOAD_DIR, runId)
+    const filePath = path.resolve(UPLOAD_DIR, runId, '.csv')
     try {
         unlinkSync(filePath)
     } catch (err) {

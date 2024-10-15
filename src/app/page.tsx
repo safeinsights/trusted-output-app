@@ -1,14 +1,13 @@
 'use client'
 
 import { FC, useEffect, useState } from 'react'
-import { Button, Group, LoadingOverlay, Modal, ModalHeader, ScrollArea, Stack, Title } from '@mantine/core'
+import { Button, Group, LoadingOverlay, Modal, ScrollArea, Stack, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 
 interface RunData {
-    [fileName: string]: { [key: string]: string }[];
+    [fileName: string]: { [key: string]: string }[]
 }
 
-// TODO Put results here eventually in a refactor, for now just redirect
 export default function Home() {
     const [runs, setRuns] = useState<RunData | null>(null)
     const [error, setError] = useState<string | null>(null)
@@ -47,8 +46,9 @@ export default function Home() {
                 {Object.entries(runs).map(([fileName, records]) => (
                     <Group key={fileName}>
                         <Title order={3}>{fileName}</Title>
-                        <Results fileName={fileName} records={records}/>
+                        <Results fileName={fileName} records={records} />
                         <Approve />
+                        <Communicate />
                     </Group>
                 ))}
             </Stack>
@@ -56,14 +56,17 @@ export default function Home() {
     )
 }
 
-const Approve: FC<{}> =() => {
-    // TODO Wire up logic to hit backend approve endpoint
-    return (
-        <Button>Approve</Button>
-    )
+const Communicate: FC<{}> = () => {
+    // TODO Wire up logic to contact the researcher
+    return <Button>Contact Researcher</Button>
 }
 
-const Results: FC<{ fileName: string; records: any }> = ({ fileName, records}) => {
+const Approve: FC<{}> = () => {
+    // TODO Wire up logic to hit backend approve endpoint
+    return <Button>Approve</Button>
+}
+
+const Results: FC<{ fileName: string; records: any }> = ({ fileName, records }) => {
     const [opened, { open, close }] = useDisclosure(false)
 
     return (
@@ -71,25 +74,26 @@ const Results: FC<{ fileName: string; records: any }> = ({ fileName, records}) =
             <Modal
                 opened={opened}
                 onClose={close}
+                size="xl"
                 title={`Results for ${fileName}`}
                 scrollAreaComponent={ScrollArea.Autosize}
             >
                 <table>
                     <thead>
-                    <tr>
-                        {Object.keys(records[0]).map((key) => (
-                            <th key={key}>{key}</th>
-                        ))}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {records.map((record, index) => (
-                        <tr key={index}>
-                            {Object.values(record).map((value, idx) => (
-                                <td key={idx}>{value}</td>
+                        <tr>
+                            {Object.keys(records[0]).map((key) => (
+                                <th key={key}>{key}</th>
                             ))}
                         </tr>
-                    ))}
+                    </thead>
+                    <tbody>
+                        {records.map((record, index) => (
+                            <tr key={index}>
+                                {Object.values(record).map((value, idx) => (
+                                    <td key={idx}>{value}</td>
+                                ))}
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </Modal>
@@ -98,4 +102,3 @@ const Results: FC<{ fileName: string; records: any }> = ({ fileName, records}) =
         </>
     )
 }
-
