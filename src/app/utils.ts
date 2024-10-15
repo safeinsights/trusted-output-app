@@ -3,6 +3,7 @@ import fs from 'fs'
 import os from 'os'
 
 export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
+export const metadataPath = path.resolve(UPLOAD_DIR, `metadata.json`)
 
 export const createUploadDirIfNotExists = async () => {
     try {
@@ -16,7 +17,6 @@ export const createUploadDirIfNotExists = async () => {
 
 export const loadMetadata = async () => {
     let metadata: any = []
-    let metadataPath = path.resolve(UPLOAD_DIR, `metadata.json`)
     if (fs.existsSync(metadataPath)) {
         metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'))
     }
@@ -40,7 +40,6 @@ export const saveMetadata = async (file: Blob, name: string, runId: string) => {
     }
     let metadata = await loadMetadata()
     metadata.push(uploaded_metadata)
-    let metadataPath = path.resolve(UPLOAD_DIR, `metadata.json`)
     try {
         fs.writeFileSync(metadataPath, JSON.stringify(metadata))
     } catch (err) {
@@ -101,7 +100,6 @@ export const approveResearch = async (runId: string) => {
     if (file) {
         file.status = 'Approved'
     }
-    let metadataPath = path.resolve(UPLOAD_DIR, `metadata.json`)
     try {
         fs.writeFileSync(metadataPath, JSON.stringify(metadata))
     } catch (err) {

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
-
 import './globals.css'
 import '@mantine/core/styles.css'
 import { Providers } from '@/components/providers'
+import { Anchor, Group } from '@mantine/core'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
     title: 'SafeInsights - TOA',
@@ -17,7 +18,19 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <Providers>{children}</Providers>
+                <Providers>
+                    <header>
+                        <Group gap="xl">
+                            <Anchor component={Link} href="/">
+                                Trusted Output App
+                            </Anchor>
+                            <Anchor component={Link} href="/research-results/all">
+                                Results
+                            </Anchor>
+                        </Group>
+                    </header>
+                    {children}
+                </Providers>
             </body>
         </html>
     )

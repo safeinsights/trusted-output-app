@@ -1,5 +1,5 @@
-import { loadResearchForReview } from '../../utils'
-import Link from 'next/link'
+import { Button, Title } from '@mantine/core'
+import { loadResearchForReview } from '@/app/utils'
 
 interface PageParams {
     params: { runId: string }
@@ -40,9 +40,11 @@ const ReviewPage = async ({ params: { runId } }: PageParams) => {
                             looks correct Please approve by clicking below.
                         </p>
                         <button>Communicate with Researcher</button>
-                        <button>
-                            <Link href={`/research-results/approve-${runId}`}>Approve</Link>
-                        </button>
+                        <Button>
+                            Approve
+                            {/*TODO Figure out if we can just hit our API? break this out into its own client component?*/}
+                            {/*<Link href={`/research-results/approve-${runId}`}>Approve</Link>*/}
+                        </Button>
                     </div>
                 </div>
             ) : (
