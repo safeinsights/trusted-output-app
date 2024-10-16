@@ -6,7 +6,7 @@ export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
 export const createUploadDirIfNotExists = async () => {
     if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, {recursive: true})
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
     }
 }
 

@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 import '@mantine/core/styles.css'
 import { Providers } from '@/components/providers'
-import { Anchor, ColorSchemeScript, Group } from '@mantine/core'
-import Link from 'next/link'
+import { AppLayout } from '@/components/app-layout'
+import { ColorSchemeScript } from '@mantine/core'
+import '@mantine/core/styles.css'
+import 'mantine-datatable/styles.layer.css'
 
 export const metadata: Metadata = {
     title: 'SafeInsights - TOA',
@@ -22,14 +24,7 @@ export default function RootLayout({
             </head>
             <body>
                 <Providers>
-                    <header>
-                        <Group gap="xl">
-                            <Anchor component={Link} href="/">
-                                Trusted Output App
-                            </Anchor>
-                        </Group>
-                    </header>
-                    {children}
+                    <AppLayout>{children}</AppLayout>
                 </Providers>
             </body>
         </html>

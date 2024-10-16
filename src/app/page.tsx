@@ -1,8 +1,11 @@
 'use client'
 
 import { FC, useEffect, useState } from 'react'
-import { Button, Group, LoadingOverlay, Modal, ScrollArea, Stack, Title } from '@mantine/core'
+import { Alert, Flex, Button, Paper, LoadingOverlay, Modal, ScrollArea, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
+import { footerStyles, mainStyles, pageStyles } from './page.css'
+import { DataTable } from 'mantine-datatable'
 
 interface RunData {
     [fileName: string]: { [key: string]: string }[]
@@ -40,28 +43,72 @@ export default function Home() {
     }
 
     return (
-        <Stack>
-            <Title order={2}>Run Results</Title>
-            <Stack>
-                {Object.entries(runs).map(([fileName, records]) => (
-                    <Group key={fileName}>
-                        <Title order={3}>{fileName}</Title>
-                        <Results fileName={fileName} records={records} />
-                        <Approve />
-                        <Communicate />
-                    </Group>
-                ))}
-            </Stack>
-        </Stack>
+        <div className={pageStyles}>
+            <main className={mainStyles}>
+                {Object.entries(runs).length == 0 ? (
+                    <Alert color="orange" title="Run Results" mb="lg">
+                        No Study result is available at this time.
+                    </Alert>
+                ) : (
+                    <Paper m="xl" shadow="xs" p="xl">
+                        <Title order={2} mb="md">
+                            Run Results
+                        </Title>
+
+                        <Flex direction={'column'}>
+                            <DataTable
+                                withTableBorder={false}
+                                withColumnBorders={false}
+                                records={Object.entries(runs).map(([fileName]) => {
+                                    return {
+                                        fileName: fileName,
+                                    }
+                                })}
+                                columns={[
+                                    { accessor: 'fileName', title: '', textAlign: 'right' },
+                                    {
+                                        accessor: 'results',
+                                        title: '',
+                                        render: (item) => (
+                                            <Results fileName={item.fileName} records={runs[item.fileName]} />
+                                        ),
+                                    },
+                                    {
+                                        accessor: 'approve',
+                                        title: '',
+                                        render: (item) => <Approve fileName={item.fileName} />,
+                                    },
+                                    {
+                                        accessor: 'communicate',
+                                        title: '',
+                                        render: () => <Communicate />,
+                                    },
+                                ]}
+                            />
+                        </Flex>
+                    </Paper>
+                )}
+            </main>
+            <footer className={footerStyles}>A SafeInsights production</footer>
+        </div>
     )
 }
 
 const Communicate: FC<{}> = () => {
     // TODO Wire up logic to contact the researcher
-    return <Button>Contact Researcher</Button>
+    const showCommunicationNotification = () => {
+        notifications.show({
+            color: 'blue',
+            title: 'Researcher Communication',
+            message: 'Communication has been done between member and researcher!',
+            autoClose: 30_000,
+            position: 'top-right',
+        })
+    }
+    return <Button onClick={() => showCommunicationNotification()}>Contact Researcher</Button>
 }
 
-const Approve: FC<{}> = () => {
+const Approve: FC<{ fileName: string }> = () => {
     // TODO Wire up logic to hit backend approve endpoint
     return <Button>Approve</Button>
 }
@@ -78,24 +125,19 @@ const Results: FC<{ fileName: string; records: any }> = ({ fileName, records }) 
                 title={`Results for ${fileName}`}
                 scrollAreaComponent={ScrollArea.Autosize}
             >
-                <table>
-                    <thead>
-                        <tr>
-                            {Object.keys(records[0]).map((key) => (
-                                <th key={key}>{key}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {records.map((record, index) => (
-                            <tr key={index}>
-                                {Object.values(record).map((value, idx) => (
-                                    <td key={idx}>{value}</td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <DataTable
+                    withTableBorder={false}
+                    withColumnBorders={false}
+                    records={records.map((record: any) => {
+                        return {
+                            ...record,
+                        }
+                    })}
+                    columns={Object.keys(records[0]).map((key: string) => ({
+                        accessor: key,
+                        title: key,
+                    }))}
+                />
             </Modal>
 
             <Button onClick={open}>View Results</Button>
