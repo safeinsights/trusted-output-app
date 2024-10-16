@@ -7,13 +7,12 @@ import { parse } from 'csv-parse/sync'
 export async function GET() {
     try {
         const runs: Record<string, any[]> = {}
+        
         if (fs.existsSync(UPLOAD_DIR)) {
-            // Get all files in the upload directory
             const files = await fs.promises.readdir(UPLOAD_DIR)
 
-            // Filter only .csv files
-            const runFiles = files.filter((file) => path.extname(file) === '.csv')
-            for (const file of runFiles) {
+
+            for (const file of files) {
                 const filePath = path.join(UPLOAD_DIR, file)
                 const fileContent = await fs.promises.readFile(filePath, 'utf-8')
 
@@ -26,8 +25,6 @@ export async function GET() {
 
         return NextResponse.json({ runs: runs })
     } catch (error) {
-        // Handle error (e.g., directory not found, permission error, etc.)
-        console.error('Error reading files:', error)
         return NextResponse.json({ error: 'Unable to read files' }, { status: 500 })
     }
 }

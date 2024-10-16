@@ -8,8 +8,13 @@ import { footerStyles, mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
 
 interface RunData {
-    [fileName: string]: { [key: string]: string }[]
+    [fileName: string]: CSVRecord[]
 }
+
+interface CSVRecord {
+    [key: string]: string
+}
+
 
 export default function Home() {
     const [runs, setRuns] = useState<RunData | null>(null)
@@ -113,7 +118,7 @@ const Approve: FC<{ fileName: string }> = () => {
     return <Button>Approve</Button>
 }
 
-const Results: FC<{ fileName: string; records: any }> = ({ fileName, records }) => {
+const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {
     const [opened, { open, close }] = useDisclosure(false)
 
     return (
