@@ -41,12 +41,15 @@
     },
     "dependencies": {
         "@clerk/nextjs": "^5.3.1",
-        "@mantine/core": "^7.12",
-        "@mantine/form": "^7.12",
-        "@mantine/modals": "^7.12",
+        "@mantine/core": "^7.13",
+        "@mantine/form": "^7.13",
+        "@mantine/modals": "^7.13",
+        "@mantine/notifications": "^7.13.2",
+        "mantine-datatable": "^7.12.4",
         "@vanilla-extract/css": "^1.15",
         "@vanilla-extract/next-plugin": "^2.4",
         "clsx": "*",
+        "csv-parse": "^5.5.6",
         "multer": "^1.4.5-lts.1",
         "next-swagger-doc": "^0.4"
     }

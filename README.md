@@ -7,6 +7,13 @@
 -   Allowing members(TM) to log in and approve the results of the code run (AKA the CSV files)
 -   Once the members approve the results, this application will post the CSV file to the management app (Endpoint TBD)
 
+## Hitting the upload endpoint:
+
+```
+curl -X POST http://localhost:3000/api/run/:runId/upload -F "file=@test-data/industry.csv" -u admin:password
+curl -X POST http://localhost:3000/api/run/:runId/upload -F "file=@test-data/currency.csv" -u admin:password
+```
+
 ## To list your AWS profiles before pushing the image:
 
 -   `aws configure list-profiles`
