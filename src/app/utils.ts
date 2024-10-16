@@ -5,12 +5,8 @@ import os from 'os'
 export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
 export const createUploadDirIfNotExists = async () => {
-    try {
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR)
-        }
-    } catch (err) {
-        console.error('Error creating directory:', err)
+    if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, {recursive: true})
     }
 }
 
@@ -26,9 +22,5 @@ export const saveFile = async (file: Blob, runId: string) => {
 
 export const deleteFile = async (runId: string) => {
     await createUploadDirIfNotExists()
-    try {
-        fs.unlinkSync(path.resolve(UPLOAD_DIR, `${runId}.csv`))
-    } catch (err) {
-        console.error('Error writing file:', err)
-    }
+    fs.unlinkSync(path.resolve(UPLOAD_DIR, runId, '.csv'))
 }
