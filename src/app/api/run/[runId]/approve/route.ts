@@ -19,33 +19,3 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         success: true,
     })
 }
-
-[
-    {
-        "Code": "AED",
-        "Symbol": "د.إ",
-        "Name": "United Arab Emirates d"
-    },
-    {
-        "Code": "AFN",
-        "Symbol": "؋",
-        "Name": "Afghan afghani"
-    },
-    {
-        "Code": "ALL",
-        "Symbol": "L",
-        "Name": "Albanian lek"
-    },
-]
-
-    [
-    {
-        "Industry": "Accounting/Finance"
-    },
-        {
-            "Industry": "Advertising/Public Relations"
-        },
-        {
-            "Industry": "Aerospace/Aviation"
-        },
-    ]
