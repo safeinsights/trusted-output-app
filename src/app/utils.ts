@@ -29,7 +29,6 @@ export const deleteFile = async (runId: string) => {
 export const generateAuthorizationHeaders = () => {
     // Generate JWT token
     const privateKey: string | undefined = process.env.MANAGEMENT_APP_PRIVATE_KEY
-    console.log(privateKey)
     const memberId: string | undefined = process.env.MANAGEMENT_APP_MEMBER_ID
     let token = ''
     if (privateKey && memberId) {

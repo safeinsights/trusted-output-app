@@ -16,10 +16,10 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     }
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
-    
+
         const fileContent = await fs.promises.readFile(filePath, 'utf-8')
         console.error('fileContent', fileContent)
-        /// TODO Create a parsable formData by the endpoint
+        // TODO Create a parsable formData by the endpoint
         const data  = new FormData()
         data.append('file', new File([Uint8Array.from(fileContent.split(''), c => c.charCodeAt(0))], runId, { type: 'text/csv' }))
         console.error('data', data)
