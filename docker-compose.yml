@@ -11,7 +11,7 @@ services:
             MANAGEMENT_APP_PRIVATE_KEY: |
                 -----BEGIN PUBLIC KEY-----
                 -----END PUBLIC KEY-----
-                
+
         build:
             context: .
             dockerfile: Dockerfile
@@ -21,7 +21,8 @@ services:
         networks:
             - trusted-output
         ports:
-            - 3000:3000
+            - 2345:2345
+        command: /bin/sh
 networks:
     trusted-output:
 volumes:
