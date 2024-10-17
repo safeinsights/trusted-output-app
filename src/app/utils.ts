@@ -23,15 +23,15 @@ export const saveFile = async (file: Blob, runId: string) => {
 
 export const deleteFile = async (runId: string) => {
     await createUploadDirIfNotExists()
-    fs.unlinkSync(path.resolve(UPLOAD_DIR, runId))
+    fs.unlinkSync(path.resolve(UPLOAD_DIR, `${runId}.csv`))
 }
 
-export const generateAuthorizationHeaders = () =>  { 
-    // Generate JWT token   
+export const generateAuthorizationHeaders = () => {
+    // Generate JWT token
     const privateKey: string | undefined = process.env.MANAGEMENT_APP_PRIVATE_KEY
     const memberId: string | undefined = process.env.MANAGEMENT_APP_MEMBER_ID
     let token = ''
-    if (privateKey && memberId ) { 
+    if (privateKey && memberId) {
         token = jwt.sign(
             {
                 iss: memberId,
@@ -41,6 +41,6 @@ export const generateAuthorizationHeaders = () =>  {
         )
     }
     return {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
     }
 }
