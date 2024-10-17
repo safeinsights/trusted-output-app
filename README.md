@@ -21,6 +21,8 @@ To generate a public/private key pair you can run:
 ```bash
 openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
 openssl rsa -pubout -in private_key.pem -out public_key.pem
+echo "MANAGEMENT_APP_PUBLIC_KEY='`cat ./public_key.pem`'" >> .env
+echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 ```
 
 ## To list your AWS profiles before pushing the image:

@@ -4,14 +4,6 @@ services:
         container_name: trusted-output
         environment:
             CI: $CI
-            MANAGEMENT_APP_PUBLIC_KEY: |
-                -----BEGIN PUBLIC KEY-----
-                -----END PUBLIC KEY-----
-
-            MANAGEMENT_APP_PRIVATE_KEY: |
-                -----BEGIN PUBLIC KEY-----
-                -----END PUBLIC KEY-----
-
         build:
             context: .
             dockerfile: Dockerfile
@@ -22,7 +14,6 @@ services:
             - trusted-output
         ports:
             - 2345:2345
-        command: /bin/sh
 networks:
     trusted-output:
 volumes:
