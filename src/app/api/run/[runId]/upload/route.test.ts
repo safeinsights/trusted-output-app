@@ -39,7 +39,7 @@ describe('POST /api/run/[runId]/upload', () => {
         expect(response.status).toBe(200)
 
         // Check if the file was written to the upload directory
-        const filePath = path.resolve(UPLOAD_DIR, mockRunId)
+        const filePath = path.resolve(UPLOAD_DIR, `${mockRunId}.csv`)
         expect(fs.existsSync(filePath)).toBe(true)
 
         // Verify the contents of the uploaded file
