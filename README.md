@@ -14,6 +14,15 @@ curl -X POST http://localhost:3000/api/run/:runId/upload -F "file=@test-data/ind
 curl -X POST http://localhost:3000/api/run/:runId/upload -F "file=@test-data/currency.csv" -u admin:password
 ```
 
+## Generate Public and Private keys
+
+To generate a public/private key pair you can run:
+
+```bash
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
 ## To list your AWS profiles before pushing the image:
 
 -   `aws configure list-profiles`

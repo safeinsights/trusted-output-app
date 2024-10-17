@@ -113,9 +113,26 @@ const Communicate: FC<{}> = () => {
     return <Button onClick={() => showCommunicationNotification()}>Contact Researcher</Button>
 }
 
-const Approve: FC<{ fileName: string }> = () => {
+const Approve: FC<{ fileName: string }> = ({fileName}) => {
     // TODO Wire up logic to hit backend approve endpoint
-    return <Button>Approve</Button>
+    const [error, setError] = useState<string | null>(null)
+    const approve = async () => {
+        try {
+            const response = await fetch(`/api/run/${fileName}/approve`,
+                {
+                    method: 'POST'
+                }
+            )
+            if (!response.ok) {
+                throw new Error('Failed to fetch run results')
+            }
+            await response.json()
+        } catch (err: any) {
+            setError(err.message || 'An error occurred')
+        }
+    }
+
+    return <Button onClick={() => approve()}>Approve</Button>
 }
 
 const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {
