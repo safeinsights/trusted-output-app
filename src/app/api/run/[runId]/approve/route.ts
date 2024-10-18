@@ -17,22 +17,21 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
 
-        const fileContent = await fs.promises.readFile(filePath, 'utf-8')
-        console.error('fileContent', fileContent)
-        // TODO Create a parsable formData by the endpoint
-        const data  = new FormData()
-        data.append('file', new File([Uint8Array.from(fileContent.split(''), c => c.charCodeAt(0))], runId, { type: 'text/csv' }))
-        console.error('data', data)
-        const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${process.env.MANAGEMENT_APP_MEMBER_ID}/results`
-        const request = new Request(endpoint, {
+        const fileBuffer = await fs.promises.readFile(filePath)
+
+        const formData = new FormData()
+        formData.append('file', new File([fileBuffer], runId, { type: 'text/csv' }))
+
+        const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${runId.replace('.csv', '')}/results`
+
+        const response = await fetch(endpoint, {
             method: 'POST',
-            body: data,
-            headers:{ ...generateAuthorizationHeaders(),
-                'Content-Type': 'multipart/form-data'
+            body: formData,
+            headers: {
+                ...generateAuthorizationHeaders(),
             },
         })
 
-        const response  = await fetch(request)
         if (!response.ok) {
             return NextResponse.json({ error: 'Unable to post file' }, { status: 500 })
         }
