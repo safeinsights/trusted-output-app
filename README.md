@@ -33,3 +33,11 @@ echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 
 -   `aws sso login --profile your-profile`
 -   `AWS_PROFILE=your-profile AWS_REGION=your-region npm run deploy:ecr`
+
+
+## To hit the management app
+1. Create a study on the management app
+2. Get the UUID of the study here: http://localhost:4000/member/openstax/studies/review
+3. take that uuid and upload it manually like so: `curl -X POST http://localhost:2345/api/run/<Run UUID HERE>/upload -F "file=@test-data/industry.csv" -u admin:password
+4. Approve the study with the UUID you just uploaded
+`
