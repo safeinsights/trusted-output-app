@@ -15,9 +15,12 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Build the Next.js app
+RUN npm run build
+
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:2345/api/health || exit 1
 
 EXPOSE 2345
 
 # Start the Next.js app in dev mode
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
