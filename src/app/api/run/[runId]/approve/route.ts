@@ -22,7 +22,7 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         const formData = new FormData()
         formData.append('file', new File([fileBuffer], runId, { type: 'text/csv' }))
 
-        const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${runId.replace('.csv', '')}/results`
+        const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${runId}/results`
         const response = await fetch(endpoint, {
             method: 'POST',
             body: formData,

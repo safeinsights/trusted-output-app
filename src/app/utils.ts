@@ -15,7 +15,7 @@ export const saveFile = async (file: Blob, runId: string) => {
     await createUploadDirIfNotExists()
     const buffer = Buffer.from(await file.arrayBuffer())
     try {
-        fs.writeFileSync(path.resolve(UPLOAD_DIR, `${runId}.csv`), buffer)
+        fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
     } catch (err) {
         console.error('Error writing file:', err)
     }
@@ -23,7 +23,7 @@ export const saveFile = async (file: Blob, runId: string) => {
 
 export const deleteFile = async (runId: string) => {
     await createUploadDirIfNotExists()
-    fs.unlinkSync(path.resolve(UPLOAD_DIR, `${runId}.csv`))
+    fs.unlinkSync(path.resolve(UPLOAD_DIR, runId))
 }
 
 export const generateAuthorizationHeaders = () => {
