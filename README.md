@@ -10,8 +10,8 @@
 ## Hitting the upload endpoint:
 
 ```
-curl -X POST http://localhost:2345/api/run/:runId/upload -F "file=@test-data/industry.csv" -u admin:password
-curl -X POST http://localhost:2345/api/run/:runId/upload -F "file=@test-data/currency.csv" -u admin:password
+curl -X POST http://localhost:3002/api/run/:runId/upload -F "file=@test-data/industry.csv" -u admin:password
+curl -X POST http://localhost:3002/api/run/:runId/upload -F "file=@test-data/currency.csv" -u admin:password
 ```
 
 ## Generate Public and Private keys
@@ -38,6 +38,6 @@ echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 ## To hit the management app
 1. Create a study on the management app
 2. Get the UUID of the study here: http://localhost:4000/member/openstax/studies/review
-3. take that uuid and upload it manually like so: `curl -X POST http://localhost:2345/api/run/<Run UUID HERE>/upload -F "file=@test-data/industry.csv" -u admin:password
+3. take that uuid and upload it manually like so: `curl -X POST http://localhost:3002/api/run/{Run_UUID_HERE}/upload -F "file=@test-data/industry.csv" -u admin:password
 4. Approve the study with the UUID you just uploaded
 `

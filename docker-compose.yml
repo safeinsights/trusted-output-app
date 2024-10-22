@@ -13,9 +13,13 @@ services:
         networks:
             - trusted-output
         ports:
-            - 2345:2345
+            - 3002:3002
+        # For local dev only, assuming devs are just running `docker compose up`
         command:
             ["npm", "run", "dev"]
+        # For sad linux users
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
 networks:
     trusted-output:
 volumes:

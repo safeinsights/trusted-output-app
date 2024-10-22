@@ -14,9 +14,9 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
     }
+
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
-
         const fileBuffer = await fs.promises.readFile(filePath)
 
         const formData = new FormData()
@@ -36,9 +36,9 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         }
 
         await deleteFile(runId)
+        return NextResponse.json({ success: true }, { status: 200 })
     }
 
-    return NextResponse.json({
-        success: true,
-    })
+    // TODO What status code? 404?
+    return NextResponse.json({ error: 'No file exists to delete' }, { status: 400 })
 }
