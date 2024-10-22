@@ -22,5 +22,5 @@ export const saveFile = async (file: Blob, runId: string) => {
 
 export const deleteFile = async (runId: string) => {
     await createUploadDirIfNotExists()
-    fs.unlinkSync(path.resolve(UPLOAD_DIR,`${runId}.csv`)))
+    fs.unlinkSync(path.resolve(UPLOAD_DIR,`${runId}.csv`))
 }
