@@ -16,7 +16,6 @@ interface CSVRecord {
     [key: string]: string
 }
 
-
 export default function Home() {
     const [runs, setRuns] = useState<RunData | null>(null)
     const [error, setError] = useState<string | null>(null)
@@ -114,15 +113,13 @@ const Communicate: FC<{}> = () => {
     return <Button onClick={() => showCommunicationNotification()}>Contact Researcher</Button>
 }
 
-const Approve: FC<{ fileName: string }> = ({fileName}) => {
+const Approve: FC<{ fileName: string }> = ({ fileName }) => {
     const router = useRouter()
     const approve = async () => {
         try {
-            const response = await fetch(`/api/run/${fileName}/approve`,
-                {
-                    method: 'POST'
-                }
-            )
+            const response = await fetch(`/api/run/${fileName}/approve`, {
+                method: 'POST',
+            })
             if (!response.ok) {
                 throw new Error('Failed to fetch run results')
             }

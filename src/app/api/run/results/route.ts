@@ -7,10 +7,9 @@ import { parse } from 'csv-parse/sync'
 export async function GET() {
     try {
         const runs: Record<string, any[]> = {}
-        
+
         if (fs.existsSync(UPLOAD_DIR)) {
             const files = await fs.promises.readdir(UPLOAD_DIR)
-
 
             for (const file of files) {
                 const filePath = path.join(UPLOAD_DIR, file)

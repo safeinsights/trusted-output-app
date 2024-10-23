@@ -15,7 +15,7 @@ describe('GET /api/runs', () => {
         }
 
         // Write test files to the upload directory
-        testFiles.forEach(file => {
+        testFiles.forEach((file) => {
             const filePath = path.join(UPLOAD_DIR, file)
             fs.writeFileSync(filePath, '')
         })
@@ -23,7 +23,7 @@ describe('GET /api/runs', () => {
 
     // Clean up the test files after each test
     afterEach(() => {
-        testFiles.forEach(file => {
+        testFiles.forEach((file) => {
             const filePath = path.join(UPLOAD_DIR, file)
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath)
@@ -44,12 +44,7 @@ describe('GET /api/runs', () => {
 
         // Only the .csv files should be listed, excluding non-CSV files
         expect(json).toEqual({
-            runs: [
-                { runId: '1' },
-                { runId: '2' },
-                { runId: '3' },
-                { runId: 'empty' },
-            ],
+            runs: [{ runId: '1' }, { runId: '2' }, { runId: '3' }, { runId: 'empty' }],
         })
     })
 

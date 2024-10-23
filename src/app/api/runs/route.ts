@@ -6,7 +6,7 @@ import path from 'path'
 export async function GET() {
     try {
         const files = await fs.promises.readdir(UPLOAD_DIR)
-        const runs = files.map(file => {
+        const runs = files.map((file) => {
             return { runId: path.basename(file) }
         })
         return NextResponse.json({ runs })
