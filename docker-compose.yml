@@ -1,6 +1,7 @@
 services:
     trusted-output:
         container_name: trusted-output
+        command: npm run dev
         environment:
             - CI=$CI
         build:

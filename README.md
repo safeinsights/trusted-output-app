@@ -7,6 +7,13 @@
 -   Allowing members(TM) to log in and approve the results of the code run (AKA the CSV files)
 -   Once the members approve the results, this application will post the CSV file to the management app (Endpoint TBD)
 
+## Running locally
+
+1. Clone this repository
+1. Run `docker compose up`
+1. Visit http://localhost:3000
+1. Press Enter instead of entering a username/password (they can be specified in a `.env` file)
+
 ## Hitting the upload endpoint:
 
 ```
