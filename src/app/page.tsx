@@ -116,8 +116,6 @@ const Communicate: FC<{}> = () => {
 
 const Approve: FC<{ fileName: string }> = ({fileName}) => {
     const router = useRouter()
-    // TODO Wire up logic to hit backend approve endpoint
-    const [error, setError] = useState<string | null>(null)
     const approve = async () => {
         try {
             const response = await fetch(`/api/run/${fileName}/approve`,
@@ -131,7 +129,13 @@ const Approve: FC<{ fileName: string }> = ({fileName}) => {
             await response.json()
             router.refresh()
         } catch (err: any) {
-            setError(err.message || 'An error occurred')
+            notifications.show({
+                color: 'red',
+                title: 'Run Approval Failed',
+                message: error,
+                autoClose: 5_000,
+                position: 'top-right',
+            })
         }
     }
 
