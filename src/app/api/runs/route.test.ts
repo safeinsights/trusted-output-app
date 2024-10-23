@@ -4,8 +4,8 @@ import path from 'path'
 import { UPLOAD_DIR } from '@/app/utils'
 import { GET } from '@/app/api/run/route'
 
-describe('GET /api/run', () => {
-    const testFiles = ['1.csv', '2.csv', '3.csv', 'empty.csv']
+describe('GET /api/runs', () => {
+    const testFiles = ['1', '2', '3', 'empty']
 
     // Create test files before each test
     beforeEach(() => {
@@ -55,7 +55,7 @@ describe('GET /api/run', () => {
 
     it('should return a 500 error if the directory cannot be read', async () => {
         // Remove the upload directory to simulate an error
-        fs.rmdirSync(UPLOAD_DIR, { recursive: true})
+        fs.rmSync(UPLOAD_DIR, { recursive: true })
         const response = await GET()
 
         expect(response.status).toBe(500)
