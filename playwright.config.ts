@@ -4,12 +4,16 @@ import { defineConfig, devices } from '@playwright/test'
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv'
+dotenv.config()
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+
+const btoa = (str: string) => Buffer.from(str).toString('base64')
+const credentialsBase64 = btoa(`${process.env.HTTP_BASIC_AUTH}`)
+
 export default defineConfig({
     testDir: './tests',
     /* Run tests in files in parallel */
@@ -28,6 +32,9 @@ export default defineConfig({
         baseURL: 'http://127.0.0.1:3002',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
+        extraHTTPHeaders: {
+            Authorization: `Basic ${credentialsBase64}`,
+        },
     },
 
     /* Configure projects for major browsers */
