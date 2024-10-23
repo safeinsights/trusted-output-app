@@ -12,7 +12,7 @@ dotenv.config()
  */
 
 const btoa = (str: string) => Buffer.from(str).toString('base64')
-const credentialsBase64 = btoa(`${process.env.HTTP_BASIC_AUTH}`)
+const credentialsBase64 = btoa(`${process.env.HTTP_BASIC_AUTH || 'admin:password'}`)
 
 export default defineConfig({
     testDir: './tests',
