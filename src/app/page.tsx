@@ -129,7 +129,7 @@ const Approve: FC<{ fileName: string }> = ({ fileName }) => {
             notifications.show({
                 color: 'red',
                 title: 'Run Approval Failed',
-                message: error,
+                message: err,
                 autoClose: 5_000,
                 position: 'top-right',
             })
