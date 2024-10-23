@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import fs from 'fs'
 import path from 'path'
 import { UPLOAD_DIR } from '@/app/utils'
-import { GET } from '@/app/api/run/route'
+import { GET } from '@/app/api/runs/route'
 
 describe('GET /api/runs', () => {
     const testFiles = ['1', '2', '3', 'empty']

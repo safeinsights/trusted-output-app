@@ -6,7 +6,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { footerStyles, mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 interface RunData {
     [fileName: string]: CSVRecord[]
@@ -129,7 +129,7 @@ const Approve: FC<{ fileName: string }> = ({fileName}) => {
                 throw new Error('Failed to fetch run results')
             }
             await response.json()
-            router.reload()
+            router.refresh()
         } catch (err: any) {
             setError(err.message || 'An error occurred')
         }
