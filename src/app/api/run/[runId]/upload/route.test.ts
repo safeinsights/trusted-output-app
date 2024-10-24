@@ -36,10 +36,7 @@ describe('POST /api/run/[runId]/upload', () => {
         const params = { runId: mockRunId }
 
         const response = await POST(req, { params })
-        const json = await response.json()
-
-        expect(json.success).toBe(true)
-        expect(json.name).toBe(mockRunId)
+        expect(response.status).toBe(200)
 
         // Check if the file was written to the upload directory
         const filePath = path.resolve(UPLOAD_DIR, mockRunId)

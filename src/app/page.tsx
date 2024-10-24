@@ -6,6 +6,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { footerStyles, mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
+import { useRouter } from 'next/navigation'
 
 interface RunData {
     [fileName: string]: CSVRecord[]
@@ -14,7 +15,6 @@ interface RunData {
 interface CSVRecord {
     [key: string]: string
 }
-
 
 export default function Home() {
     const [runs, setRuns] = useState<RunData | null>(null)
@@ -113,9 +113,30 @@ const Communicate: FC<{}> = () => {
     return <Button onClick={() => showCommunicationNotification()}>Contact Researcher</Button>
 }
 
-const Approve: FC<{ fileName: string }> = () => {
-    // TODO Wire up logic to hit backend approve endpoint
-    return <Button>Approve</Button>
+const Approve: FC<{ fileName: string }> = ({ fileName }) => {
+    const router = useRouter()
+    const approve = async () => {
+        try {
+            const response = await fetch(`/api/run/${fileName}/approve`, {
+                method: 'POST',
+            })
+            if (!response.ok) {
+                throw new Error('Failed to fetch run results')
+            }
+            await response.json()
+            router.refresh()
+        } catch (err: any) {
+            notifications.show({
+                color: 'red',
+                title: 'Run Approval Failed',
+                message: err,
+                autoClose: 5_000,
+                position: 'top-right',
+            })
+        }
+    }
+
+    return <Button onClick={() => approve()}>Approve</Button>
 }
 
 const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {

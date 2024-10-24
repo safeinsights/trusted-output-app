@@ -6,7 +6,6 @@ test.describe('app', () => {
         // await setupClerkTestingToken({ page });
 
         await page.goto('/')
-        await expect(page).toHaveTitle(/SafeInsights/)
-        await expect(page.getByText('Hello World')).toBeVisible()
+        await expect(page).toHaveTitle(/SafeInsights - TOA/)
     })
 })

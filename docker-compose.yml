@@ -1,19 +1,24 @@
 services:
     trusted-output:
+        env_file: .env
         container_name: trusted-output
         environment:
-            - CI=$CI
+            CI: $CI
         build:
             context: .
             dockerfile: Dockerfile
         volumes:
-            - ./:/app/
-            - node_modules:/app/node_modules
+            - ./src:/app/src
         restart: always
         networks:
             - trusted-output
         ports:
-            - 3000:3000
+            - 3002:3002
+        # For local dev only, assuming devs are just running `docker compose up`
+        command: ['npm', 'run', 'dev']
+        # For sad linux users
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
 networks:
     trusted-output:
 volumes:
