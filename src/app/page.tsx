@@ -83,11 +83,6 @@ export default function Home() {
                                         title: '',
                                         render: (item) => <Approve fileName={item.fileName} />,
                                     },
-                                    {
-                                        accessor: 'communicate',
-                                        title: '',
-                                        render: () => <Communicate />,
-                                    },
                                 ]}
                             />
                         </Flex>
@@ -97,20 +92,6 @@ export default function Home() {
             <footer className={footerStyles}>A SafeInsights production</footer>
         </div>
     )
-}
-
-const Communicate: FC<{}> = () => {
-    // TODO Wire up logic to contact the researcher
-    const showCommunicationNotification = () => {
-        notifications.show({
-            color: 'blue',
-            title: 'Researcher Communication',
-            message: 'Communication has been done between member and researcher!',
-            autoClose: 30_000,
-            position: 'top-right',
-        })
-    }
-    return <Button onClick={() => showCommunicationNotification()}>Contact Researcher</Button>
 }
 
 const Approve: FC<{ fileName: string }> = ({ fileName }) => {
@@ -126,10 +107,11 @@ const Approve: FC<{ fileName: string }> = ({ fileName }) => {
             await response.json()
             router.refresh()
         } catch (err: any) {
+            console.error(err)
             notifications.show({
                 color: 'red',
                 title: 'Run Approval Failed',
-                message: err,
+                message: 'Failed to approve the run. Please try again later.',
                 autoClose: 5_000,
                 position: 'top-right',
             })
@@ -153,7 +135,7 @@ const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, rec
             >
                 <DataTable
                     withTableBorder={false}
-                    withColumnBorders={false}
+                    withColumnBorders={true}
                     records={records.map((record: any) => {
                         return {
                             ...record,
