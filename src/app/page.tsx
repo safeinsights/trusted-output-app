@@ -82,7 +82,7 @@ export default function Home() {
                                         accessor: 'approve',
                                         title: '',
                                         render: (item) => <Approve fileName={item.fileName} />,
-                                    }
+                                    },
                                 ]}
                             />
                         </Flex>
