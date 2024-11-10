@@ -102,16 +102,23 @@ const Approve: FC<{ fileName: string }> = ({ fileName }) => {
                 method: 'POST',
             })
             if (!response.ok) {
-                throw new Error('Failed to fetch run results')
+                throw new Error('Failed to submit result to management app.')
             }
             await response.json()
+            notifications.show({
+                color: 'green',
+                title: 'Study Run Approved',
+                message: 'The run has been approved.',
+                autoClose: 5_000,
+                position: 'top-right',
+            })
             router.refresh()
         } catch (err: any) {
             console.error(err)
             notifications.show({
                 color: 'red',
-                title: 'Run Approval Failed',
-                message: 'Failed to approve the run. Please try again later.',
+                title: 'Study Run Approval Failed',
+                message: `An error occured while approving the study run. ${err.message}. Please retry later.`,
                 autoClose: 5_000,
                 position: 'top-right',
             })
@@ -129,9 +136,14 @@ const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, rec
             <Modal
                 opened={opened}
                 onClose={close}
-                size="xl"
+                size="100%"
                 title={`Results for ${fileName}`}
                 scrollAreaComponent={ScrollArea.Autosize}
+                overlayProps={{
+                    backgroundOpacity: 0.55,
+                    blur: 3,
+                }}
+                centered
             >
                 <DataTable
                     withTableBorder={false}
@@ -148,7 +160,9 @@ const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, rec
                 />
             </Modal>
 
-            <Button onClick={open}>View Results</Button>
+            <Button variant="outline" onClick={open}>
+                View Results
+            </Button>
         </>
     )
 }

@@ -34,7 +34,7 @@
         "eslint": "*",
         "eslint-config-next": "*",
         "eslint-config-prettier": "*",
-        "happy-dom": "*",
+        "happy-dom": ">=15.10.2",
         "npm-run-all": "*",
         "prettier": "*",
         "vite-tsconfig-paths": "^5.0.1",
