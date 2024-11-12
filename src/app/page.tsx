@@ -73,6 +73,10 @@ const Approve: FC<{ fileName: string }> = ({ fileName }) => {
 
 const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {
     const [opened, { open, close }] = useDisclosure(false)
+    const columns = Object.keys(records[0]).map((key: string) => ({
+        accessor: key,
+        title: key,
+    }))
 
     return (
         <>
@@ -89,18 +93,11 @@ const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, rec
                 centered
             >
                 <DataTable
-                    idAccessor={'id'}
+                    idAccessor={columns[0].title}
                     withTableBorder={false}
                     withColumnBorders={true}
-                    records={records.map((record: any) => {
-                        return {
-                            ...record,
-                        }
-                    })}
-                    columns={Object.keys(records[0]).map((key: string) => ({
-                        accessor: key,
-                        title: key,
-                    }))}
+                    records={records}
+                    columns={columns}
                 />
             </Modal>
 
