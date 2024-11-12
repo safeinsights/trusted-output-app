@@ -6,7 +6,6 @@ import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { footerStyles, mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
-import { useRouter } from 'next/navigation'
 
 interface RunData {
     [fileName: string]: CSVRecord[]
@@ -20,22 +19,21 @@ export default function Home() {
     const [runs, setRuns] = useState<RunData | null>(null)
     const [error, setError] = useState<string | null>(null)
 
-    useEffect(() => {
-        // Fetch the data from the API
-        const fetchRunResults = async () => {
-            try {
-                const response = await fetch('/api/run/results')
-                if (!response.ok) {
-                    throw new Error('Failed to fetch run results')
-                }
-
-                const data = await response.json()
-                setRuns(data.runs)
-            } catch (err: any) {
-                setError(err.message || 'An error occurred')
+    // Fetch the data from the API
+    const fetchRunResults = async () => {
+        try {
+            const response = await fetch('/api/run/results')
+            if (!response.ok) {
+                throw new Error('Failed to fetch run results')
             }
-        }
 
+            const data = await response.json()
+            setRuns(data.runs)
+        } catch (err: any) {
+            setError(err.message || 'An error occurred')
+        }
+    }
+    useEffect(() => {
         fetchRunResults()
     }, [])
 
@@ -81,7 +79,7 @@ export default function Home() {
                                     {
                                         accessor: 'approve',
                                         title: '',
-                                        render: (item) => <Approve fileName={item.fileName} />,
+                                        render: (item) => <Approve fileName={item.fileName} callback={() => fetchRunResults()} />,
                                     },
                                 ]}
                             />
@@ -94,8 +92,7 @@ export default function Home() {
     )
 }
 
-const Approve: FC<{ fileName: string }> = ({ fileName }) => {
-    const router = useRouter()
+const Approve: FC<{ fileName: string, callback: ()=>void }> = ({ fileName, callback}) => {
     const approve = async () => {
         try {
             const response = await fetch(`/api/run/${fileName}/approve`, {
@@ -112,7 +109,7 @@ const Approve: FC<{ fileName: string }> = ({ fileName }) => {
                 autoClose: 5_000,
                 position: 'top-right',
             })
-            router.refresh()
+            callback()
         } catch (err: any) {
             console.error(err)
             notifications.show({
