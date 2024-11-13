@@ -10,12 +10,12 @@ interface Run {
     runId: string
 }
 
-export async function GET() {
+export function GET() {
     try {
         let runs: Run[] = []
 
         if (fs.existsSync(UPLOAD_DIR)) {
-            const files = await fs.promises.readdir(UPLOAD_DIR)
+            const files = fs.readdirSync(UPLOAD_DIR)
             runs = files.map((file) => {
                 return { runId: path.basename(file) }
             })
