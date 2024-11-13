@@ -4,18 +4,18 @@ import { notifications } from '@mantine/notifications'
 export interface CSVRecord {
     [key: string]: string
 }
-//
-// interface RunData {
-//     [fileName: string]: CSVRecord[]
-// }
+
+interface RunData {
+    [fileName: string]: CSVRecord[]
+}
 
 export const useRunResults = () => {
     return useQuery({
         queryKey: ['run-results'],
-        queryFn: async () => {
+        queryFn: async (): Promise<RunData> => {
             const response = await fetch('/api/run/results')
             const data = await response.json()
-            return data.runs
+            return data.runs as RunData
         },
     })
 }

@@ -8,7 +8,7 @@ import { DataTable } from 'mantine-datatable'
 import { CSVRecord, useApproveRun, useRunResults } from '@/app/requests'
 
 export default function Home() {
-    const { data: runs, isLoading, isError, error } = useRunResults()
+    const { data: runs = {}, isLoading, isError, error } = useRunResults()
 
     if (isError) {
         return <div>Error: {error.toString()}</div>
