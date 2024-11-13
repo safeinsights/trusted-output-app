@@ -4,6 +4,9 @@ import path from 'path'
 import { UPLOAD_DIR } from '@/app/utils'
 import { parse } from 'csv-parse/sync'
 
+// This disables caching for this endpoint
+export const revalidate = 0
+
 export async function GET() {
     try {
         const runs: Record<string, any[]> = {}

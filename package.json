@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "next dev -p 3002",
         "build": "next build",
-        "start": "next start",
+        "start": "next start -p 3002",
         "docker:build": "docker build -t trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
