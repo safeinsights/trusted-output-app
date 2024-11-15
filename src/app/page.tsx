@@ -1,49 +1,20 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
-import { Alert, Flex, Button, Paper, LoadingOverlay, Modal, ScrollArea, Title } from '@mantine/core'
+import { FC } from 'react'
+import { Alert, Button, Flex, LoadingOverlay, Modal, Paper, ScrollArea, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { notifications } from '@mantine/notifications'
 import { footerStyles, mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
-import { useRouter } from 'next/navigation'
-
-interface RunData {
-    [fileName: string]: CSVRecord[]
-}
-
-interface CSVRecord {
-    [key: string]: string
-}
+import { CSVRecord, useApproveRun, useRunResults } from '@/app/requests'
 
 export default function Home() {
-    const [runs, setRuns] = useState<RunData | null>(null)
-    const [error, setError] = useState<string | null>(null)
+    const { data: runs = {}, isLoading, isError, error } = useRunResults()
 
-    useEffect(() => {
-        // Fetch the data from the API
-        const fetchRunResults = async () => {
-            try {
-                const response = await fetch('/api/run/results')
-                if (!response.ok) {
-                    throw new Error('Failed to fetch run results')
-                }
-
-                const data = await response.json()
-                setRuns(data.runs)
-            } catch (err: any) {
-                setError(err.message || 'An error occurred')
-            }
-        }
-
-        fetchRunResults()
-    }, [])
-
-    if (error) {
-        return <div>Error: {error}</div>
+    if (isError) {
+        return <div>Error: {error.toString()}</div>
     }
 
-    if (!runs) {
+    if (isLoading) {
         return <LoadingOverlay />
     }
 
@@ -62,6 +33,7 @@ export default function Home() {
 
                         <Flex direction={'column'}>
                             <DataTable
+                                idAccessor={'fileName'}
                                 withTableBorder={false}
                                 withColumnBorders={false}
                                 records={Object.entries(runs).map(([fileName]) => {
@@ -95,41 +67,16 @@ export default function Home() {
 }
 
 const Approve: FC<{ fileName: string }> = ({ fileName }) => {
-    const router = useRouter()
-    const approve = async () => {
-        try {
-            const response = await fetch(`/api/run/${fileName}/approve`, {
-                method: 'POST',
-            })
-            if (!response.ok) {
-                throw new Error('Failed to submit result to management app.')
-            }
-            await response.json()
-            notifications.show({
-                color: 'green',
-                title: 'Study Run Approved',
-                message: 'The run has been approved.',
-                autoClose: 5_000,
-                position: 'top-right',
-            })
-            router.refresh()
-        } catch (err: any) {
-            console.error(err)
-            notifications.show({
-                color: 'red',
-                title: 'Study Run Approval Failed',
-                message: `An error occured while approving the study run. ${err.message}. Please retry later.`,
-                autoClose: 5_000,
-                position: 'top-right',
-            })
-        }
-    }
-
-    return <Button onClick={() => approve()}>Approve</Button>
+    const approve = useApproveRun()
+    return <Button onClick={() => approve.mutate(fileName)}>Approve</Button>
 }
 
 const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {
     const [opened, { open, close }] = useDisclosure(false)
+    const columns = Object.keys(records[0]).map((key: string) => ({
+        accessor: key,
+        title: key,
+    }))
 
     return (
         <>
@@ -146,17 +93,11 @@ const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, rec
                 centered
             >
                 <DataTable
+                    idAccessor={columns[0].title}
                     withTableBorder={false}
                     withColumnBorders={true}
-                    records={records.map((record: any) => {
-                        return {
-                            ...record,
-                        }
-                    })}
-                    columns={Object.keys(records[0]).map((key: string) => ({
-                        accessor: key,
-                        title: key,
-                    }))}
+                    records={records}
+                    columns={columns}
                 />
             </Modal>
 

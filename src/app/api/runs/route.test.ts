@@ -37,7 +37,7 @@ describe('GET /api/runs', () => {
     })
 
     it('should return a list of run IDs from CSV files', async () => {
-        const response = await GET()
+        const response = GET()
 
         expect(response.status).toBe(200)
         const json = await response.json()
@@ -48,13 +48,13 @@ describe('GET /api/runs', () => {
         })
     })
 
-    it('should return a 500 error if the directory cannot be read', async () => {
+    it('should return an empty array if the directory doesnt exist', async () => {
         // Remove the upload directory to simulate an error
         fs.rmSync(UPLOAD_DIR, { recursive: true })
-        const response = await GET()
+        const response = GET()
 
-        expect(response.status).toBe(500)
+        expect(response.status).toBe(200)
         const json = await response.json()
-        expect(json).toEqual({ error: 'Unable to read files' })
+        expect(json).toEqual({ runs: [] })
     })
 })
