@@ -28,7 +28,10 @@ export const useApproveRun = () => {
             const response = await fetch(`/api/run/${fileName}/approve`, {
                 method: 'POST',
             })
-            await response.json()
+            if (!response.ok) {
+                const message = await response.json()
+                throw new Error(`${message.error}`)
+            }
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['run-results'] })
