@@ -1,19 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import fs from 'fs'
 import path from 'path'
-import { UPLOAD_DIR } from '@/app/utils'
 import { GET } from '@/app/api/runs/route'
+import { UPLOAD_DIR } from '@/app/utils'
 
 describe('GET /api/runs', () => {
     const testFiles = ['1', '2', '3', 'empty']
 
-    // Create test files before each test
     beforeEach(() => {
-        // Ensure the upload directory exists
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-        }
-
+        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
         // Write test files to the upload directory
         testFiles.forEach((file) => {
             const filePath = path.join(UPLOAD_DIR, file)
@@ -21,19 +16,8 @@ describe('GET /api/runs', () => {
         })
     })
 
-    // Clean up the test files after each test
     afterEach(() => {
-        testFiles.forEach((file) => {
-            const filePath = path.join(UPLOAD_DIR, file)
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath)
-            }
-        })
-
-        // Optionally, remove the directory if it's empty
-        if (fs.existsSync(UPLOAD_DIR) && fs.readdirSync(UPLOAD_DIR).length === 0) {
-            fs.rmdirSync(UPLOAD_DIR)
-        }
+        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
     })
 
     it('should return a list of run IDs from CSV files', async () => {

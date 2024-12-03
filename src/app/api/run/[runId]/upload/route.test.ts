@@ -4,21 +4,16 @@ import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
 import { UPLOAD_DIR } from '@/app/utils'
-import { rmSync } from 'node:fs' // for cleanup
-
-// Ensure the upload directory exists
-beforeEach(() => {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-    }
-})
-
-// Clean up after each test
-afterEach(() => {
-    rmSync(UPLOAD_DIR, { recursive: true, force: true })
-})
 
 describe('POST /api/run/[runId]/upload', () => {
+    beforeEach(() => {
+        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
+    })
+
+    afterEach(() => {
+        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
+    })
+
     it('should upload a file successfully', async () => {
         // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })

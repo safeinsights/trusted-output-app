@@ -16,7 +16,6 @@ describe('middleware', () => {
 
     beforeEach(() => {
         vi.resetAllMocks()
-        process.env.HTTP_BASIC_AUTH = `${AUTH_USER}:${AUTH_PASS}`
     })
 
     const createMockRequest = (authHeader?: string): Partial<NextRequest> => ({

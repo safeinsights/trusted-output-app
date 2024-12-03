@@ -5,14 +5,14 @@ import jwt from 'jsonwebtoken'
 
 export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
-export const createUploadDirIfNotExists = async () => {
+export const createUploadDirIfNotExists = () => {
     if (!fs.existsSync(UPLOAD_DIR)) {
         fs.mkdirSync(UPLOAD_DIR, { recursive: true })
     }
 }
 
 export const saveFile = async (file: Blob, runId: string) => {
-    await createUploadDirIfNotExists()
+    createUploadDirIfNotExists()
     const buffer = Buffer.from(await file.arrayBuffer())
     try {
         fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
@@ -22,7 +22,7 @@ export const saveFile = async (file: Blob, runId: string) => {
 }
 
 export const deleteFile = async (runId: string) => {
-    await createUploadDirIfNotExists()
+    createUploadDirIfNotExists()
     fs.unlinkSync(path.resolve(UPLOAD_DIR, runId))
 }
 

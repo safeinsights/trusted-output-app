@@ -1,9 +1,8 @@
 'use client'
 
 import { FC } from 'react'
-import { Alert, Button, Flex, Grid, LoadingOverlay, Modal, Paper, ScrollArea, Stack, Title } from '@mantine/core'
+import { Alert, Button, LoadingOverlay, Modal, Paper, ScrollArea, Stack, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { mainStyles, pageStyles } from './page.css'
 import { DataTable } from 'mantine-datatable'
 import { CSVRecord, useApproveRun, useRunResults } from '@/app/requests'
 
