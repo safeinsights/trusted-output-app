@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { POST } from '@/app/api/run/[runId]/upload/route'
+import { POST } from './route'
 import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
-import { rm } from 'fs/promises'
-import { UPLOAD_DIR } from '@/app/utils' // for cleanup
+import { UPLOAD_DIR } from '@/app/utils'
+import { rmSync } from 'node:fs' // for cleanup
 
 // Ensure the upload directory exists
 beforeEach(() => {
@@ -14,8 +14,8 @@ beforeEach(() => {
 })
 
 // Clean up after each test
-afterEach(async () => {
-    await rm(UPLOAD_DIR, { recursive: true, force: true })
+afterEach(() => {
+    rmSync(UPLOAD_DIR, { recursive: true, force: true })
 })
 
 describe('POST /api/run/[runId]/upload', () => {
