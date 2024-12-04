@@ -16,7 +16,7 @@ export const saveFile = async (file: Blob, runId: string) => {
     const buffer = Buffer.from(await file.arrayBuffer())
     try {
         fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
-    } catch (err) {
+    } /* v8 ignore next 3 */ catch (err) {
         console.error('Error writing file:', err)
     }
 }

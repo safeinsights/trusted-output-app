@@ -54,4 +54,20 @@ describe('POST /api/run/[runId]/upload', () => {
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
     })
+
+    it('should return an error if no runID is provided', async () => {
+        // Empty FormData object
+        const formData = new FormData()
+
+        // Mock the NextRequest
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = {}
+        // @ts-ignore
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        const data = await response.json()
+        expect(data.error).toBe('Missing runId')
+    })
 })

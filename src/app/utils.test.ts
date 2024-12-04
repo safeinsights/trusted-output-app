@@ -36,7 +36,9 @@ describe('Utils', () => {
 
             // Verify the directory was not recreated
             const files = fs.readdirSync(UPLOAD_DIR)
-            expect(files).toEqual([]) // No files should be added unexpectedly
+
+            // No files should be added unexpectedly
+            expect(files).toEqual([])
         })
     })
 
@@ -83,6 +85,7 @@ describe('Utils', () => {
             process.env.MANAGEMENT_APP_PRIVATE_KEY = privateKey
             process.env.MANAGEMENT_APP_MEMBER_ID = memberId
 
+            // @ts-ignore
             const tokenSpy = vi.spyOn(jwt, 'sign').mockReturnValueOnce('mock-jwt-token')
 
             const headers = generateAuthorizationHeaders()

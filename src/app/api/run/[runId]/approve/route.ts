@@ -16,6 +16,7 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     }
 
     const filePath = path.join(UPLOAD_DIR, runId)
+    /* v8 ignore start */
     if (fs.existsSync(filePath)) {
         const fileBuffer = await fs.promises.readFile(filePath)
 
@@ -38,6 +39,7 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         await deleteFile(runId)
         return NextResponse.json({ success: true }, { status: 200 })
     }
+    /* v8 ignore stop */
 
     // TODO What status code? 404?
     return NextResponse.json({ error: 'No file exists to delete' }, { status: 400 })

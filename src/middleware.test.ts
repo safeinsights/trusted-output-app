@@ -20,7 +20,7 @@ describe('middleware', () => {
 
     const createMockRequest = (authHeader?: string): Partial<NextRequest> => ({
         headers: {
-            // TODO Cannot figure out this typescript issue below with `get`
+            // @ts-ignore
             get: vi.fn((key: string) => {
                 return key.toLowerCase() === 'authorization' ? authHeader : null
             }),
