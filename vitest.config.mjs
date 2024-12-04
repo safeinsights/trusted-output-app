@@ -14,8 +14,10 @@ export default defineConfig({
             enabled: true,
             // skipFull: true,
             // FIXME: In the future, when we're ready, we should re-enable this threshold check
-            // thresholds: { 100: true },
+            thresholds: { 100: true },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
         },
+        // Disable parallelism to avoid file operations from multiple tests at the same time
+        fileParallelism: false,
     },
 })

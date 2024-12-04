@@ -8,7 +8,8 @@ describe('GET /api/runs', () => {
     const testFiles = ['1', '2', '3', 'empty']
 
     beforeEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+
         // Write test files to the upload directory
         testFiles.forEach((file) => {
             const filePath = path.join(UPLOAD_DIR, file)
