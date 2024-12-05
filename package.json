@@ -14,6 +14,7 @@
         "checks": "run-p -c typecheck lint",
         "test:e2e": "playwright test",
         "test:unit": "vitest",
+        "test:unit:coverage": "vitest run --coverage",
         "test": "run-p -c test:*",
         "ecr:login": "aws ecr get-login-password --profile $AWS_PROFILE --region $AWS_REGION | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com",
         "ecr:create-if-needed": "aws ecr describe-repositories --repository-names trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION || aws ecr create-repository --repository-name trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION",
