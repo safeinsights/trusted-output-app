@@ -15,15 +15,12 @@ describe('POST /api/run/[runId]/upload', () => {
     })
 
     it('should upload a file successfully', async () => {
-        // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
         const mockRunId = '123'
 
-        // Create a FormData object with the mock file
         const formData = new FormData()
         formData.append('file', new File([mockFile], mockRunId))
 
-        // Mock the NextRequest
         const req = {
             formData: async () => formData,
         } as NextRequest
@@ -43,7 +40,6 @@ describe('POST /api/run/[runId]/upload', () => {
     })
 
     it('should return failure if no file is uploaded', async () => {
-        // Empty FormData object
         const formData = new FormData()
 
         // Mock the NextRequest
@@ -56,7 +52,6 @@ describe('POST /api/run/[runId]/upload', () => {
     })
 
     it('should return an error if no runID is provided', async () => {
-        // Empty FormData object
         const formData = new FormData()
 
         // Mock the NextRequest

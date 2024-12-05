@@ -23,6 +23,9 @@ describe('POST /api/run/:runId/approve', () => {
     })
     it('should return 400 if runId is missing', async () => {
         const req = new Request('http://localhost', { method: 'POST' })
+        // TODO Is this the best way to handle this? should we mock the url with a param instead?
+        //  params cannot be empty as its a required prop :thinking:
+        // @ts-ignore
         const res = await POST(req as any, { params: {} })
 
         // Check status
