@@ -6,16 +6,16 @@ import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react(), tsconfigPaths(), vanillaExtractPlugin()],
+    setupFiles: './vitest.setup.ts',
     test: {
         mockReset: true,
-        environment: 'happy-dom',
+        environment: 'jsdom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
         coverage: {
             enabled: true,
-            // skipFull: true,
-            // FIXME: In the future, when we're ready, we should re-enable this threshold check
-            // thresholds: { 100: true },
+            thresholds: { 100: true },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
+            reportOnFailure: true,
         },
     },
 })
