@@ -14,11 +14,7 @@ export const createUploadDirIfNotExists = () => {
 export const saveFile = async (file: Blob, runId: string) => {
     createUploadDirIfNotExists()
     const buffer = Buffer.from(await file.arrayBuffer())
-    try {
-        fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
-    } /* v8 ignore next 3 */ catch (err) {
-        console.error('Error writing file:', err)
-    }
+    fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
 }
 
 export const deleteFile = async (runId: string) => {

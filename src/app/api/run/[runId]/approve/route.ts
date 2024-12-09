@@ -3,11 +3,6 @@ import { deleteFile, generateAuthorizationHeaders, UPLOAD_DIR } from '@/app/util
 import path from 'path'
 import fs from 'fs'
 
-// TODO This component will do two things
-//  1. Post the file to the management API
-//  2. If the management call is successful, we will delete the file from our filesystem
-//  2.a If unsuccessful - show appropriate error message?
-// To be done in https://openstax.atlassian.net/browse/SHRMP-21
 export const POST = async (req: NextRequest, { params }: { params: { runId: string } }) => {
     const runId = params.runId
 
@@ -16,7 +11,6 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
     }
 
     const filePath = path.join(UPLOAD_DIR, runId)
-    /* v8 ignore start */
     if (fs.existsSync(filePath)) {
         const fileBuffer = await fs.promises.readFile(filePath)
 
@@ -39,7 +33,6 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         await deleteFile(runId)
         return NextResponse.json({ success: true }, { status: 200 })
     }
-    /* v8 ignore stop */
 
     // TODO What status code? 404?
     return NextResponse.json({ error: 'No file exists to delete' }, { status: 400 })

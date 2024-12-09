@@ -36,6 +36,7 @@
         "eslint-config-next": "*",
         "eslint-config-prettier": "*",
         "happy-dom": ">=15.10.2",
+        "mock-fs": "^5.4.1",
         "npm-run-all": "*",
         "prettier": "*",
         "vite-tsconfig-paths": "^5.0.1",

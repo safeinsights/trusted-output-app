@@ -1,43 +1,34 @@
-import { createUploadDirIfNotExists, saveFile, deleteFile, generateAuthorizationHeaders, UPLOAD_DIR } from './utils'
-import fs from 'fs'
+import { createUploadDirIfNotExists, deleteFile, generateAuthorizationHeaders, saveFile, UPLOAD_DIR } from './utils'
+import mockFs from 'mock-fs'
 import path from 'path'
 import jwt from 'jsonwebtoken'
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import fs from 'fs'
 
 describe('Utils', () => {
-    beforeEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
-    })
-
-    afterEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
-    })
-
     describe('createUploadDirIfNotExists', () => {
         it('should create the upload directory if it does not exist', async () => {
             // Ensure the directory does not exist
-            expect(fs.existsSync(UPLOAD_DIR)).toBe(false)
+            mockFs({})
+            expect(() => fs.statSync(UPLOAD_DIR)).toThrow()
 
             createUploadDirIfNotExists()
 
             // Verify the directory was created
-            expect(fs.existsSync(UPLOAD_DIR)).toBe(true)
+            expect(fs.statSync(UPLOAD_DIR).isDirectory()).toBe(true)
         })
 
         it('should not create the upload directory if it already exists', async () => {
-            // Create the directory manually
-            fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-
-            // Ensure the directory exists
-            expect(fs.existsSync(UPLOAD_DIR)).toBe(true)
+            // Ensure the directory already exists
+            mockFs({
+                [UPLOAD_DIR]: {},
+            })
 
             // Try to create it again
             createUploadDirIfNotExists()
 
-            // Verify the directory was not recreated
+            // Verify the directory is still intact
             const files = fs.readdirSync(UPLOAD_DIR)
-
-            // No files should be added unexpectedly
             expect(files).toEqual([])
         })
     })
@@ -53,8 +44,9 @@ describe('Utils', () => {
             const filePath = path.resolve(UPLOAD_DIR, runId)
             expect(fs.existsSync(filePath)).toBe(true)
 
-            // Clean up the file after the test
-            fs.rmSync(filePath)
+            // Verify the content of the file
+            const content = fs.readFileSync(filePath, 'utf8')
+            expect(content).toBe('test file content')
         })
     })
 

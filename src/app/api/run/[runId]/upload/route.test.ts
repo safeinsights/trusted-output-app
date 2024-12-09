@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import path from 'path'
@@ -6,14 +6,6 @@ import fs from 'fs'
 import { UPLOAD_DIR } from '@/app/utils'
 
 describe('POST /api/run/[runId]/upload', () => {
-    beforeEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
-    })
-
-    afterEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
-    })
-
     it('should upload a file successfully', async () => {
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
         const mockRunId = '123'

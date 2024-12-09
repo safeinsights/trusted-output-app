@@ -1,31 +1,23 @@
 import { POST } from '@/app/api/run/[runId]/approve/route'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import path from 'path'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
-import fs from 'fs'
+import mockFs from 'mock-fs'
 
 describe('POST /api/run/:runId/approve', () => {
     const mockFileContent = 'header1,header2\nvalue1,value2'
     const runId = 'test-run-id'
-    const mockFilePath: string = path.join(UPLOAD_DIR, runId)
 
-    // Create a temporary test directory before each test
     beforeEach(() => {
-        // recreate directory
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-        // add the file
-        fs.writeFileSync(mockFilePath, mockFileContent)
+        // Mock the file system with the necessary file
+        mockFs({
+            [UPLOAD_DIR]: {
+                [runId]: mockFileContent,
+            },
+        })
     })
 
-    // Clean up the test directory after each test
-    afterEach(() => {
-        fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
-    })
     it('should return 400 if runId is missing', async () => {
         const req = new Request('http://localhost', { method: 'POST' })
-        // TODO Is this the best way to handle this? should we mock the url with a param instead?
-        //  params cannot be empty as its a required prop :thinking:
-        // @ts-ignore
         const res = await POST(req as any, { params: {} })
 
         // Check status
@@ -37,6 +29,11 @@ describe('POST /api/run/:runId/approve', () => {
     })
 
     it('should return 400 if the file does not exist', async () => {
+        // Simulate the file not existing by removing it from mockFs
+        mockFs({
+            [UPLOAD_DIR]: {}, // Empty the directory to simulate no file for 'runId'
+        })
+
         const req = new Request('http://localhost', { method: 'POST' })
         const res = await POST(req as any, { params: { runId: 'non-existent-run' } })
 
@@ -46,5 +43,35 @@ describe('POST /api/run/:runId/approve', () => {
         // Check JSON payload
         const data = await res.json()
         expect(data).toEqual({ error: 'No file exists to delete' })
+    })
+
+    it('should return 500 if the external API request fails', async () => {
+        // Mock the fetch call to simulate failure
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: false }))
+
+        const req = new Request('http://localhost', { method: 'POST' })
+        const res = await POST(req as any, { params: { runId } })
+
+        // Check status
+        expect(res.status).toBe(500)
+
+        // Check JSON payload
+        const data = await res.json()
+        expect(data).toEqual({ error: 'Unable to post file' })
+    })
+
+    it('should return 200 and success if the file exists and external API request succeeds', async () => {
+        // Mock the fetch call to simulate success
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true }))
+
+        const req = new Request('http://localhost', { method: 'POST' })
+        const res = await POST(req as any, { params: { runId } })
+
+        // Check status
+        expect(res.status).toBe(200)
+
+        // Check JSON payload
+        const data = await res.json()
+        expect(data).toEqual({ success: true })
     })
 })
