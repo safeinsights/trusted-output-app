@@ -19,16 +19,14 @@ describe('middleware', () => {
     })
 
     const createMockRequest = (authHeader?: string): Partial<NextRequest> => ({
-        headers: {
-            // @ts-ignore
-            get: vi.fn((key: string) => {
-                return key.toLowerCase() === 'authorization' ? authHeader : null
-            }),
+        headers: new Map<string, string | null>([['authorization', authHeader || null]]),
+        get(key: string) {
+            return this.headers.get(key.toLowerCase()) || null
         },
     })
+
     it('should return 401 for missing Authorization header', () => {
         const mockRequest = createMockRequest()
-        // make the request
         middleware(mockRequest as NextRequest)
 
         expect(NextResponse.json).toHaveBeenCalledWith(
@@ -43,7 +41,6 @@ describe('middleware', () => {
     it('should return 401 for invalid credentials', () => {
         const invalidAuth = Buffer.from('invalid:credentials').toString('base64')
         const mockRequest = createMockRequest(`Basic ${invalidAuth}`)
-        // make the request
         middleware(mockRequest as NextRequest)
 
         expect(NextResponse.json).toHaveBeenCalledWith(
@@ -58,10 +55,8 @@ describe('middleware', () => {
     it('should proceed with NextResponse.next() for valid credentials', () => {
         const validAuth = Buffer.from(`${AUTH_USER}:${AUTH_PASS}`).toString('base64')
         const mockRequest = createMockRequest(`Basic ${validAuth}`)
-
         middleware(mockRequest as NextRequest)
 
-        // Verify it passed through and auth was successful
         expect(NextResponse.next).toHaveBeenCalled()
     })
 })

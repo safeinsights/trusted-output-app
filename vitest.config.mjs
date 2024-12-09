@@ -15,7 +15,7 @@ export default defineConfig({
             enabled: true,
             thresholds: { 100: true },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
-            exclude: ['**/*.test.ts'],
+            reportOnFailure: true,
         },
     },
 })

@@ -25,6 +25,7 @@
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "@playwright/test": "^1.46",
+        "@tanstack/query-core": "^5.62.3",
         "@testing-library/react": "^16.0",
         "@types/jsonwebtoken": "^9.0.7",
         "@types/mock-fs": "^4.13.4",
