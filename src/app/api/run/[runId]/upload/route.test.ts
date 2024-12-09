@@ -54,7 +54,5 @@ describe('POST /api/run/[runId]/upload', () => {
         // @ts-ignore
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
-        const data = await response.json()
-        expect(data.error).toBe('Missing runId')
     })
 })

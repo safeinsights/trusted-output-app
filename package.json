@@ -27,6 +27,7 @@
         "@playwright/test": "^1.46",
         "@testing-library/react": "^16.0",
         "@types/jsonwebtoken": "^9.0.7",
+        "@types/mock-fs": "^4.13.4",
         "@types/react": "18.3",
         "@vanilla-extract/vite-plugin": "^4.0.13",
         "@vitejs/plugin-react": "^4.3.1",
