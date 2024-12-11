@@ -1,71 +1,97 @@
-import { middleware } from './middleware'
-import { NextResponse } from 'next/server'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest, NextResponse } from 'next/server'
+import { middleware, config } from './middleware'
 
-// Mock NextResponse methods
-vi.mock('next/server', () => ({
-    NextResponse: {
-        next: vi.fn(() => 'NextResponse.next() called'),
-        json: vi.fn((body: any, init?: any) => ({ body, ...init })),
-    },
-}))
-
-describe('middleware', () => {
-    const [AUTH_USER, AUTH_PASS] = (process.env.HTTP_BASIC_AUTH || 'admin:password').split(':')
+describe('Middleware', () => {
+    // Store original environment variables
+    const originalEnv = { ...process.env }
 
     beforeEach(() => {
+        // Reset environment variables before each test
+        process.env = { ...originalEnv }
+
+        // Reset any mocks
         vi.resetAllMocks()
     })
 
-    it('should return 401 for missing Authorization header', async () => {
-        global.fetch = vi
-            .fn()
-            .mockResolvedValue(
-                new Response(JSON.stringify({ message: 'Authentication required' }), {
-                    status: 401,
-                    headers: { 'WWW-Authenticate': 'Basic' },
-                }),
-            )
+    describe('Authentication Scenarios', () => {
+        it('returns next response for valid authentication', () => {
+            // Set specific credentials
+            process.env.HTTP_BASIC_AUTH = 'testuser:testpass'
 
-        middleware({ headers: {} } as any)
+            const req = {
+                headers: {
+                    get: vi.fn().mockReturnValue('Basic ' + Buffer.from('testuser:testpass').toString('base64')),
+                },
+            } as unknown as NextRequest
 
-        expect(NextResponse.json).toHaveBeenCalledWith(
-            { message: 'Authentication required' },
-            {
-                status: 401,
-                headers: { 'WWW-Authenticate': 'Basic' },
-            },
-        )
+            const response = middleware(req)
+
+            // Explicitly check for NextResponse.next()
+            expect(response).toEqual(NextResponse.next())
+        })
+
+        it('returns 401 response for missing authorization header', () => {
+            const req = {
+                headers: {
+                    get: vi.fn().mockReturnValue(null),
+                },
+            } as unknown as NextRequest
+
+            const response = middleware(req)
+
+            expect(response.status).toBe(401)
+            expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
+        })
+
+        it('returns 401 response for malformed authorization header', () => {
+            const req = {
+                headers: {
+                    get: vi.fn().mockReturnValue('Basic malformed'),
+                },
+            } as unknown as NextRequest
+
+            const response = middleware(req)
+
+            expect(response.status).toBe(401)
+            expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
+        })
+
+        it('returns 401 response with incorrect credentials', () => {
+            // Set specific credentials
+            process.env.HTTP_BASIC_AUTH = 'testuser:testpass'
+
+            const req = {
+                headers: {
+                    get: vi.fn().mockReturnValue('Basic ' + Buffer.from('wronguser:wrongpass').toString('base64')),
+                },
+            } as unknown as NextRequest
+
+            const response = middleware(req)
+
+            expect(response.status).toBe(401)
+            expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
+        })
+
+        it('uses default credentials when HTTP_BASIC_AUTH is not set', () => {
+            // Unset the environment variable to use default
+            delete process.env.HTTP_BASIC_AUTH
+
+            const req = {
+                headers: {
+                    get: vi.fn().mockReturnValue('Basic ' + Buffer.from('admin:password').toString('base64')),
+                },
+            } as unknown as NextRequest
+
+            const response = middleware(req)
+
+            expect(response).toEqual(NextResponse.next())
+        })
     })
 
-    it('should return 401 for invalid credentials', async () => {
-        const invalidAuth = Buffer.from('invalid:credentials').toString('base64')
-        global.fetch = vi
-            .fn()
-            .mockResolvedValue(
-                new Response(JSON.stringify({ message: 'Authentication required' }), {
-                    status: 401,
-                    headers: { 'WWW-Authenticate': 'Basic' },
-                }),
-            )
-
-        middleware({ headers: { Authorization: `Basic ${invalidAuth}` } } as any)
-
-        expect(NextResponse.json).toHaveBeenCalledWith(
-            { message: 'Authentication required' },
-            {
-                status: 401,
-                headers: { 'WWW-Authenticate': 'Basic' },
-            },
-        )
-    })
-
-    it('should proceed with NextResponse.next() for valid credentials', async () => {
-        const validAuth = Buffer.from(`${AUTH_USER}:${AUTH_PASS}`).toString('base64')
-        global.fetch = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
-
-        middleware({ headers: { Authorization: `Basic ${validAuth}` } } as any)
-
-        expect(NextResponse.next).toHaveBeenCalled()
+    describe('Configuration', () => {
+        it('has a matcher that excludes specific routes', () => {
+            expect(config.matcher).toBe('/((?!favicon.ico|api/health).*)')
+        })
     })
 })

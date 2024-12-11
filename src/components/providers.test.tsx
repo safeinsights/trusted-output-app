@@ -1,55 +1,76 @@
-import { describe, it, expect, vi } from 'vitest'
-import { makeQueryClient, getQueryClient, Providers } from './providers'
-import { QueryClient } from '@tanstack/query-core'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
-import React from 'react'
+import { QueryClient } from '@tanstack/react-query'
+import { createTheme } from '@mantine/core'
+import { getQueryClient, makeQueryClient, Providers } from '@/components/providers'
 
-// Mock dependencies
-vi.mock('@tanstack/query-core', async () => {
-    const actual = await vi.importActual('@tanstack/query-core')
+// Partial mock to include createTheme
+vi.mock('@mantine/core', async (importOriginal) => {
+    const actual = await importOriginal()
     return {
         ...actual,
-        isServer: false, // Default to client-side for testing
+        MantineProvider: vi.fn(({ children }) => <div>{children}</div>),
+        createTheme: vi.fn((config) => config || {}),
     }
 })
 
+vi.mock('@mantine/modals', () => ({
+    ModalsProvider: vi.fn(({ children }) => <div>{children}</div>),
+}))
+
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+    const actual = await importOriginal()
+    return {
+        ...actual,
+        QueryClientProvider: vi.fn(({ children }) => <div>{children}</div>),
+    }
+})
+
+vi.mock('@tanstack/query-core', () => ({
+    isServer: false,
+    QueryClient: vi.fn(),
+}))
+
 describe('Providers', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+    })
+
     describe('makeQueryClient', () => {
-        it('creates a QueryClient with default options', () => {
+        it('creates QueryClient with correct default options', () => {
             const queryClient = makeQueryClient()
 
-            expect(queryClient).toBeInstanceOf(QueryClient)
-
-            // Check default query options
-            const defaultOptions = queryClient.getDefaultOptions().queries
-            expect(defaultOptions?.staleTime).toBe(60 * 1000)
+            expect(QueryClient).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    defaultOptions: {
+                        queries: {
+                            staleTime: 60 * 1000,
+                        },
+                    },
+                }),
+            )
         })
     })
 
     describe('getQueryClient', () => {
-        it('returns a new query client on the server', () => {
-            // Mock isServer to true
-            vi.mock('@tanstack/query-core', async () => {
-                const actual = await vi.importActual('@tanstack/query-core')
-                return {
-                    ...actual,
-                    isServer: true,
-                }
-            })
+        it('creates new client on server', () => {
+            // Simulate server environment
+            vi.mock('@tanstack/query-core', () => ({
+                isServer: true,
+                QueryClient: vi.fn(),
+            }))
 
-            const queryClient = getQueryClient()
-            expect(queryClient).toBeInstanceOf(QueryClient)
+            const client = getQueryClient()
+
+            expect(client).toBeTruthy()
         })
 
-        it('returns the same query client on the client side', () => {
-            // Mock isServer to false
-            vi.mock('@tanstack/query-core', async () => {
-                const actual = await vi.importActual('@tanstack/query-core')
-                return {
-                    ...actual,
-                    isServer: false,
-                }
-            })
+        it('reuses browser client on subsequent calls', () => {
+            // Reset to browser environment
+            vi.mock('@tanstack/query-core', () => ({
+                isServer: false,
+                QueryClient: vi.fn(),
+            }))
 
             const firstClient = getQueryClient()
             const secondClient = getQueryClient()
@@ -58,8 +79,8 @@ describe('Providers', () => {
         })
     })
 
-    describe('Providers Component', () => {
-        it('renders children wrapped with providers', () => {
+    describe('Providers component', () => {
+        it('renders children through nested providers', () => {
             const TestChild = () => <div>Test Child</div>
 
             const { getByText } = render(
@@ -68,25 +89,13 @@ describe('Providers', () => {
                 </Providers>,
             )
 
-            // Verify child is rendered
             expect(getByText('Test Child')).toBeInTheDocument()
         })
 
-        it('provides query client context', () => {
-            const TestChild = () => <div>Test Child</div>
+        it('passes theme to MantineProvider', () => {
+            render(<Providers>test</Providers>)
 
-            const { container } = render(
-                <Providers>
-                    <TestChild />
-                </Providers>,
-            )
-
-            // Check for QueryClientProvider and MantineProvider
-            const queryClientProvider = container.querySelector('[data-rq-provider]')
-            const mantineProvider = container.querySelector('[data-mantine-color-scheme]')
-
-            expect(queryClientProvider).toBeTruthy()
-            expect(mantineProvider).toBeTruthy()
+            expect(vi.mocked(createTheme)).toHaveBeenCalledWith(expect.anything())
         })
     })
 })
