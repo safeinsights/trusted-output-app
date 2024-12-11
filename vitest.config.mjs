@@ -9,7 +9,7 @@ export default defineConfig({
     setupFiles: './vitest.setup.ts',
     test: {
         mockReset: true,
-        environment: 'jsdom',
+        environment: 'happy-dom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
         coverage: {
             enabled: true,

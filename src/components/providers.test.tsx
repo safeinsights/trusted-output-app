@@ -1,85 +1,92 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { getQueryClient, makeQueryClient, Providers } from './providers'
+import { describe, it, expect, vi } from 'vitest'
+import { makeQueryClient, getQueryClient, Providers } from './providers'
 import { QueryClient } from '@tanstack/query-core'
+import { render } from '@testing-library/react'
+import React from 'react'
 
-// Mocking `isServer` and `QueryClient`
-vi.mock('@tanstack/query-core', () => {
-    const actual = vi.importActual('@tanstack/query-core')
+// Mock dependencies
+vi.mock('@tanstack/query-core', async () => {
+    const actual = await vi.importActual('@tanstack/query-core')
     return {
         ...actual,
-        isServer: false, // Default to false
-        QueryClient: vi.fn(() => ({
-            defaultOptions: {
-                queries: { staleTime: 60 * 1000 },
-            },
-        })),
+        isServer: false, // Default to client-side for testing
     }
 })
 
-describe('getQueryClient', () => {
-    afterEach(() => {
-        vi.resetModules()
-    })
-
-    it('creates a new query client on the server', async () => {
-        vi.mock('@tanstack/query-core', () => ({ isServer: true }))
-        const queryClient = getQueryClient()
-        expect(queryClient).toBeInstanceOf(QueryClient)
-    })
-
-    it('reuses the query client in the browser', async () => {
-        vi.mock('@tanstack/query-core', () => ({ isServer: false }))
-        const firstClient = getQueryClient()
-        const secondClient = getQueryClient()
-        expect(firstClient).toBe(secondClient)
-    })
-})
-
 describe('Providers', () => {
-    afterEach(() => {
-        vi.clearAllMocks()
+    describe('makeQueryClient', () => {
+        it('creates a QueryClient with default options', () => {
+            const queryClient = makeQueryClient()
+
+            expect(queryClient).toBeInstanceOf(QueryClient)
+
+            // Check default query options
+            const defaultOptions = queryClient.getDefaultOptions().queries
+            expect(defaultOptions?.staleTime).toBe(60 * 1000)
+        })
     })
 
-    it('renders children correctly', () => {
-        render(
-            <Providers>
-                <div data-testid="test-child">Test Child</div>
-            </Providers>,
-        )
-        expect(screen.getByTestId('test-child')).toHaveTextContent('Test Child')
+    describe('getQueryClient', () => {
+        it('returns a new query client on the server', () => {
+            // Mock isServer to true
+            vi.mock('@tanstack/query-core', async () => {
+                const actual = await vi.importActual('@tanstack/query-core')
+                return {
+                    ...actual,
+                    isServer: true,
+                }
+            })
+
+            const queryClient = getQueryClient()
+            expect(queryClient).toBeInstanceOf(QueryClient)
+        })
+
+        it('returns the same query client on the client side', () => {
+            // Mock isServer to false
+            vi.mock('@tanstack/query-core', async () => {
+                const actual = await vi.importActual('@tanstack/query-core')
+                return {
+                    ...actual,
+                    isServer: false,
+                }
+            })
+
+            const firstClient = getQueryClient()
+            const secondClient = getQueryClient()
+
+            expect(firstClient).toBe(secondClient)
+        })
     })
 
-    it('creates a QueryClient with default options', () => {
-        const queryClient = makeQueryClient()
-        expect(queryClient).toBeInstanceOf(QueryClient)
-        expect(queryClient.defaultOptions?.queries?.staleTime).toBe(60000)
-    })
+    describe('Providers Component', () => {
+        it('renders children wrapped with providers', () => {
+            const TestChild = () => <div>Test Child</div>
 
-    it('creates a new query client on the server for each request', () => {
-        // Mock `isServer` to return true
-        const { isServer } = vi.importActual('@tanstack/query-core')
-        vi.mocked(isServer).mockReturnValue(true)
+            const { getByText } = render(
+                <Providers>
+                    <TestChild />
+                </Providers>,
+            )
 
-        const { getQueryClient } = require('./providers')
-        const firstClient = getQueryClient()
-        const secondClient = getQueryClient()
+            // Verify child is rendered
+            expect(getByText('Test Child')).toBeInTheDocument()
+        })
 
-        expect(firstClient).not.toBe(secondClient)
-        expect(QueryClient).toHaveBeenCalledTimes(2) // Two separate clients created
-    })
+        it('provides query client context', () => {
+            const TestChild = () => <div>Test Child</div>
 
-    it('reuses browserQueryClient when `isServer` is false', () => {
-        // Mock `isServer` to return false
-        const { isServer } = vi.importActual('@tanstack/query-core')
-        vi.mocked(isServer).mockReturnValue(false)
+            const { container } = render(
+                <Providers>
+                    <TestChild />
+                </Providers>,
+            )
 
-        const { getQueryClient } = require('./providers')
-        const firstClient = getQueryClient()
-        const secondClient = getQueryClient()
+            // Check for QueryClientProvider and MantineProvider
+            const queryClientProvider = container.querySelector('[data-rq-provider]')
+            const mantineProvider = container.querySelector('[data-mantine-color-scheme]')
 
-        expect(firstClient).toBe(secondClient) // Reuses the same client
-        expect(QueryClient).toHaveBeenCalledTimes(1) // Only one client created
+            expect(queryClientProvider).toBeTruthy()
+            expect(mantineProvider).toBeTruthy()
+        })
     })
 })

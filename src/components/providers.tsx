@@ -28,7 +28,7 @@ export function makeQueryClient() {
     })
 }
 
-let browserQueryClient: QueryClient | undefined = undefined
+let browserQueryClient: QueryClient = makeQueryClient()
 
 export function getQueryClient() {
     if (isServer) {
@@ -43,6 +43,7 @@ export function getQueryClient() {
         return browserQueryClient
     }
 }
+
 export const Providers: React.FC<Props> = ({ children }) => {
     const queryClient = getQueryClient()
     return (

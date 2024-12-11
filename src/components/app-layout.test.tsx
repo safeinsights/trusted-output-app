@@ -18,7 +18,9 @@ describe('AppLayout Component', () => {
                 <div />
             </AppLayout>,
         )
-        expect(screen.getByRole('link', { name: /safeinsights logo/i })).toBeInTheDocument()
+        const logoLink = screen.getByRole('link', { name: /safeinsights logo/i })
+        expect(logoLink).toBeInTheDocument()
+        expect(logoLink.getAttribute('href')).toBe('/') // Optional: Check link destination
     })
 
     it('contains the header with the correct text', () => {
@@ -45,7 +47,7 @@ describe('AppLayout Component', () => {
                 <div />
             </AppLayout>,
         )
-        // Assuming Notifications renders an element with a specific class or ID
+        // Assuming Notifications renders a region with aria-label or accessible name
         expect(screen.getByRole('region', { name: /notifications/i })).toBeInTheDocument()
     })
 })

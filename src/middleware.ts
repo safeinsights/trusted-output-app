@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 const [AUTH_USER, AUTH_PASS] = (process.env.HTTP_BASIC_AUTH || 'admin:password').split(':')
 
 function isAuthenticated(req: NextRequest) {
-    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+    const authHeader = req.headers.get('authorization')
 
     if (!authHeader) {
         return false
