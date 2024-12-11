@@ -11,18 +11,13 @@ interface Run {
 }
 
 export function GET() {
-    try {
-        let runs: Run[] = []
+    let runs: Run[] = []
 
-        if (fs.existsSync(UPLOAD_DIR)) {
-            const files = fs.readdirSync(UPLOAD_DIR)
-            runs = files.map((file) => {
-                return { runId: path.basename(file) }
-            })
-        }
-        return NextResponse.json({ runs })
-    } catch (error) {
-        // Handle error (e.g., directory not found, permission error, etc.)
-        return NextResponse.json({ error: 'Unable to read files' }, { status: 500 })
+    if (fs.existsSync(UPLOAD_DIR)) {
+        const files = fs.readdirSync(UPLOAD_DIR)
+        runs = files.map((file) => {
+            return { runId: path.basename(file) }
+        })
     }
+    return NextResponse.json({ runs })
 }

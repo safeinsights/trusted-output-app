@@ -1,34 +1,18 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { POST } from '@/app/api/run/[runId]/upload/route'
+import { describe, expect, it } from 'vitest'
+import { POST } from './route'
 import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
-import { rm } from 'fs/promises'
-import { UPLOAD_DIR } from '@/app/utils' // for cleanup
-
-// Ensure the upload directory exists
-beforeEach(() => {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-    }
-})
-
-// Clean up after each test
-afterEach(async () => {
-    await rm(UPLOAD_DIR, { recursive: true, force: true })
-})
+import { UPLOAD_DIR } from '@/app/utils'
 
 describe('POST /api/run/[runId]/upload', () => {
     it('should upload a file successfully', async () => {
-        // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
         const mockRunId = '123'
 
-        // Create a FormData object with the mock file
         const formData = new FormData()
         formData.append('file', new File([mockFile], mockRunId))
 
-        // Mock the NextRequest
         const req = {
             formData: async () => formData,
         } as NextRequest
@@ -48,7 +32,6 @@ describe('POST /api/run/[runId]/upload', () => {
     })
 
     it('should return failure if no file is uploaded', async () => {
-        // Empty FormData object
         const formData = new FormData()
 
         // Mock the NextRequest
@@ -56,6 +39,19 @@ describe('POST /api/run/[runId]/upload', () => {
             formData: async () => formData,
         } as NextRequest
         const params = { runId: '123' }
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+    })
+
+    it('should return an error if no runID is provided', async () => {
+        const formData = new FormData()
+
+        // Mock the NextRequest
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = {}
+        // @ts-ignore
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
     })

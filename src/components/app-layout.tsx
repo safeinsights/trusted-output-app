@@ -1,4 +1,4 @@
-import { Group, AppShell, AppShellHeader, AppShellMain } from '@mantine/core'
+import { Group, AppShell, AppShellHeader, AppShellMain, AppShellFooter } from '@mantine/core'
 import { SafeInsightsLogo } from './si-logo'
 import Link from 'next/link'
 import { Notifications } from '@mantine/notifications'
@@ -23,6 +23,8 @@ export function AppLayout({ children }: Props) {
             </AppShellHeader>
 
             <AppShellMain>{children}</AppShellMain>
+
+            <AppShellFooter>A SafeInsights production</AppShellFooter>
         </AppShell>
     )
 }
