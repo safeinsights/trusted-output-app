@@ -1,4 +1,11 @@
-import { createUploadDirIfNotExists, deleteFile, generateAuthorizationHeaders, saveFile, UPLOAD_DIR } from './utils'
+import {
+    createUploadDirIfNotExists,
+    deleteFile,
+    generateAuthorizationHeaders,
+    isValidUUID,
+    saveFile,
+    UPLOAD_DIR,
+} from './utils'
 import mockFs from 'mock-fs'
 import path from 'path'
 import jwt from 'jsonwebtoken'
@@ -97,6 +104,16 @@ describe('Utils', () => {
             expect(headers).toEqual({
                 Authorization: 'Bearer ',
             })
+        })
+    })
+
+    describe('isValidUUID', () => {
+        it('should return false on an invalid UUID', () => {
+            expect(isValidUUID('123')).toBe(false)
+        })
+
+        it('should return true on a valid UUID', () => {
+            expect(isValidUUID('a9bcdef7-575e-4083-8fbf-e1a743f29f24')).toBe(true)
         })
     })
 })
