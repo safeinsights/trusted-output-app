@@ -1,9 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, beforeEach } from 'vitest'
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
 import { UPLOAD_DIR } from '@/app/utils'
+import mockFs from 'mock-fs'
+
+beforeEach(() => {
+    fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
+})
 
 describe('POST /api/run/[runId]/upload', () => {
     it('should upload a file successfully', async () => {
@@ -54,5 +59,27 @@ describe('POST /api/run/[runId]/upload', () => {
         // @ts-ignore
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
+    })
+
+    it('should return an error if the runID has results already', async () => {
+        const mockRunId = '123'
+
+        mockFs({
+            [UPLOAD_DIR]: {
+                [mockRunId]: '',
+            },
+        })
+
+        const formData = new FormData()
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        const params = { runId: mockRunId }
+
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Data already exists for runId')
     })
 })
