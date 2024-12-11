@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveFile, UPLOAD_DIR } from '@/app/utils'
+import { saveFile, UPLOAD_DIR, isValidUUID } from '@/app/utils'
 import path from 'path'
 import fs from 'fs'
 
@@ -14,6 +14,10 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
 
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
+    }
+
+    if (!isValidUUID(runId)) {
+        return NextResponse.json({ error: 'runId is not a UUID' }, { status: 400 })
     }
 
     const filePath = path.join(UPLOAD_DIR, runId)
