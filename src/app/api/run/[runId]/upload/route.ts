@@ -20,6 +20,14 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         return NextResponse.json({ error: 'runId is not a UUID' }, { status: 400 })
     }
 
+    if (!('file' in body)) {
+        return NextResponse.json({ error: 'Form data does not include expected file key' }, { status: 400 })
+    }
+
+    if (Object.keys(body).length !== 1) {
+        return NextResponse.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
+    }
+
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
         return NextResponse.json({ error: 'Data already exists for runId' }, { status: 400 })

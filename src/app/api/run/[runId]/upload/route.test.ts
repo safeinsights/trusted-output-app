@@ -47,6 +47,24 @@ describe('POST /api/run/[runId]/upload', () => {
         const params = { runId: uuidv4() }
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data does not include expected file key')
+    })
+
+    it('should return failure if unexpected form data is included', async () => {
+        const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
+        const mockRunId = uuidv4()
+
+        const formData = new FormData()
+        formData.append('file', new File([mockFile], mockRunId))
+        formData.append('file2', new File([mockFile], mockRunId))
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = { runId: uuidv4() }
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data includes unexpected data keys')
     })
 
     it('should return failure if runId is not a UUID', async () => {
@@ -88,6 +106,7 @@ describe('POST /api/run/[runId]/upload', () => {
         })
 
         const formData = new FormData()
+        formData.append('file','')
 
         const req = {
             formData: async () => formData,
