@@ -106,7 +106,7 @@ describe('POST /api/run/[runId]/upload', () => {
         })
 
         const formData = new FormData()
-        formData.append('file','')
+        formData.append('file', '')
 
         const req = {
             formData: async () => formData,
