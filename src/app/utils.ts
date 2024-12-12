@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import os from 'os'
 import jwt from 'jsonwebtoken'
+import { validate as uuidValidate } from 'uuid'
 
 export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
@@ -39,4 +40,8 @@ export const generateAuthorizationHeaders = () => {
     return {
         Authorization: `Bearer ${token}`,
     }
+}
+
+export const isValidUUID = (value: string): boolean => {
+    return uuidValidate(value)
 }
