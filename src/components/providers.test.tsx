@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { QueryClient } from '@tanstack/react-query'
 import { createTheme } from '@mantine/core'
@@ -38,7 +38,7 @@ describe('Providers', () => {
 
     describe('makeQueryClient', () => {
         it('creates QueryClient with correct default options', () => {
-            const queryClient = makeQueryClient()
+            makeQueryClient()
 
             expect(QueryClient).toHaveBeenCalledWith(
                 expect.objectContaining({
