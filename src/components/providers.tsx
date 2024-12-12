@@ -3,8 +3,7 @@
 import { MantineProvider } from '@mantine/core'
 import { theme } from '@/theme'
 import { ModalsProvider } from '@mantine/modals'
-import { isServer, QueryClient } from '@tanstack/query-core'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider, QueryClient, isServer } from '@tanstack/react-query'
 import { FC } from 'react'
 
 // if using Clerk for authentication:
