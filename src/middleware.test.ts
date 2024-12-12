@@ -30,6 +30,7 @@ describe('Middleware', () => {
             // Important: Check that it returns NextResponse.next()
             expect(response).toBeTruthy()
         })
+
         it('returns 401 response for missing authorization header', () => {
             const req = {
                 headers: {
