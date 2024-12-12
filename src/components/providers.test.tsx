@@ -8,6 +8,7 @@ import { getQueryClient, makeQueryClient, Providers } from '@/components/provide
 vi.mock('@mantine/core', async (importOriginal) => {
     const actual = await importOriginal()
     return {
+        // @ts-ignore
         ...actual,
         MantineProvider: vi.fn(({ children }) => <div>{children}</div>),
         createTheme: vi.fn((config) => config || {}),
@@ -21,6 +22,7 @@ vi.mock('@mantine/modals', () => ({
 vi.mock('@tanstack/react-query', async (importOriginal) => {
     const actual = await importOriginal()
     return {
+        // @ts-ignore
         ...actual,
         QueryClientProvider: vi.fn(({ children }) => <div>{children}</div>),
     }
