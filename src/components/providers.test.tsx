@@ -62,6 +62,7 @@ describe('Providers', () => {
 
             const client = getQueryClient()
 
+            expect(makeQueryClient).toHaveBeenCalled()
             expect(client).toBeTruthy()
         })
 
