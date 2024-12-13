@@ -2,12 +2,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { Providers, makeQueryClient, getQueryClient } from './providers'
 import { QueryClient, isServer } from '@tanstack/react-query'
+import * as ReactQuery from '@tanstack/react-query'
 
-// Mock dependencies
-vi.mock('@tanstack/react-query', async (importOriginal) => {
-    const actual = await importOriginal()
+// Mock the entire module
+vi.mock('@tanstack/react-query', async () => {
+    const actual = await vi.importActual('@tanstack/react-query')
     return {
-        // @ts-ignore
         ...actual,
         isServer: vi.fn(),
     }
@@ -28,7 +28,7 @@ describe('Providers', () => {
     describe('getQueryClient', () => {
         it('returns a new QueryClient when on server', () => {
             // Mock isServer to be true
-            vi.mocked(isServer).mockReturnValue(true)
+            vi.mocked(ReactQuery.isServer).mockReturnValue(true)
 
             const queryClient1 = getQueryClient()
             const queryClient2 = getQueryClient()
