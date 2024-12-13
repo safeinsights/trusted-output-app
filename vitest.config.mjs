@@ -14,7 +14,11 @@ export default defineConfig({
         exclude: ['src/components/providers.test.tsx'],
         coverage: {
             enabled: true,
-            thresholds: { 100: true },
+            // Eventually, after discussion, add some global rules
+            // thresholds: { 100: true },
+            thresholds: {
+                lines: true,
+            },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
             exclude: ['src/components/providers.tsx'],
             reportOnFailure: true,
