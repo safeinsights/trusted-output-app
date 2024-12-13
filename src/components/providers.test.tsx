@@ -1,34 +1,45 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
-import { Providers, makeQueryClient, getQueryClient } from './providers'
-import { QueryClient, isServer } from '@tanstack/react-query'
-import * as ReactQuery from '@tanstack/react-query'
+import { getQueryClient, Providers } from './providers'
+import { QueryClient } from '@tanstack/react-query'
 
-// Mock the entire module
-vi.mock('@tanstack/react-query', async () => {
-    const actual = await vi.importActual('@tanstack/react-query')
+// Create a mock for isServer
+const mockIsServer = vi.fn(() => false)
+
+// Temporarily replace the isServer implementation
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+    const actual = await importOriginal()
     return {
+        // @ts-ignore
         ...actual,
-        isServer: vi.fn(),
+        isServer: () => mockIsServer(),
     }
 })
 
+// Mock Mantine and Modals providers to avoid rendering actual components
+vi.mock('@mantine/core', () => ({
+    MantineProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="mantine-provider">{children}</div>
+    ),
+}))
+
+vi.mock('@mantine/modals', () => ({
+    ModalsProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modals-provider">{children}</div>
+    ),
+}))
+
 describe('Providers', () => {
-    describe('makeQueryClient', () => {
-        it('creates a QueryClient with correct default options', () => {
-            const queryClient = makeQueryClient()
-
-            expect(queryClient).toBeInstanceOf(QueryClient)
-
-            const defaultOptions = queryClient.getDefaultOptions()
-            expect(defaultOptions.queries?.staleTime).toBe(60 * 1000)
-        })
+    // Reset the mock before each test
+    beforeEach(() => {
+        mockIsServer.mockReset()
+        mockIsServer.mockReturnValue(false) // Default to false
     })
 
     describe('getQueryClient', () => {
         it('returns a new QueryClient when on server', () => {
-            // Mock isServer to be true
-            vi.mocked(ReactQuery.isServer).mockReturnValue(true)
+            // Set isServer to true for this test
+            mockIsServer.mockReturnValue(true)
 
             const queryClient1 = getQueryClient()
             const queryClient2 = getQueryClient()
@@ -36,50 +47,59 @@ describe('Providers', () => {
             expect(queryClient1).toBeInstanceOf(QueryClient)
             expect(queryClient2).toBeInstanceOf(QueryClient)
 
-            // Instead of checking object reference, check something unique about the instances
-            const options1 = queryClient1.getDefaultOptions()
-            const options2 = queryClient2.getDefaultOptions()
-
-            expect(options1).toEqual(options2) // Same default configuration
-            expect(queryClient1).not.toBe(queryClient2) // Different object instances
+            // Ensure different instances are created on server
+            expect(queryClient1).not.toEqual(queryClient2)
         })
 
         it('returns the same QueryClient instance when in browser', () => {
-            // Mock isServer to be false
-            vi.mocked(isServer).mockReturnValue(false)
+            // Ensure isServer is false
+            mockIsServer.mockReturnValue(false)
 
             const queryClient1 = getQueryClient()
             const queryClient2 = getQueryClient()
 
+            // Should return the same instance
             expect(queryClient1).toEqual(queryClient2)
         })
     })
 
     describe('Providers component', () => {
-        it('renders children correctly', () => {
-            const TestChild = () => <div data-testid="test-child">Test</div>
+        it('renders children within all providers', () => {
+            const TestChild = () => <div data-testid="test-child">Test Content</div>
 
-            const { container, getByTestId } = render(
+            const { getByTestId, container } = render(
                 <Providers>
                     <TestChild />
                 </Providers>,
             )
 
+            // Check if child is rendered
             const child = getByTestId('test-child')
             expect(child).toBeTruthy()
 
-            const childElements = container.querySelectorAll('[data-testid="test-child"]')
-            expect(childElements.length).toBe(1)
+            // Verify provider hierarchy
+            const mantineProvider = container.querySelector('[data-testid="mantine-provider"]')
+            const modalsProvider = container.querySelector('[data-testid="modals-provider"]')
+
+            expect(mantineProvider).toBeTruthy()
+            expect(modalsProvider).toBeTruthy()
+
+            // Ensure child is within the providers
+            expect(modalsProvider?.textContent).toContain('Test Content')
         })
 
-        it('composes providers correctly', () => {
+        it('passes children correctly through provider layers', () => {
+            const TestChild = () => <div data-testid="test-child">Nested Content</div>
+
             const { container } = render(
                 <Providers>
-                    <div>Test Content</div>
+                    <TestChild />
                 </Providers>,
             )
 
-            expect(container.innerHTML).toContain('Test Content')
+            // Verify the content is present in the final rendered output
+            const childContent = container.textContent
+            expect(childContent).toContain('Nested Content')
         })
     })
 })

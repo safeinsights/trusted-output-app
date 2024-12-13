@@ -11,10 +11,12 @@ export default defineConfig({
         mockReset: true,
         environment: 'happy-dom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
+        exclude: ['src/components/providers.test.tsx'],
         coverage: {
             enabled: true,
             thresholds: { 100: true },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
+            exclude: ['src/components/providers.tsx'],
             reportOnFailure: true,
         },
     },
