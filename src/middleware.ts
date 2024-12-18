@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 const [AUTH_USER, AUTH_PASS] = (process.env.HTTP_BASIC_AUTH || 'admin:password').split(':')
 
 function isAuthenticated(req: NextRequest) {
-    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+    const authHeader = req.headers.get('authorization')
 
     if (!authHeader) {
         return false
@@ -14,26 +14,23 @@ function isAuthenticated(req: NextRequest) {
     const user = auth[0]
     const pass = auth[1]
 
-    if (user == AUTH_USER && pass == AUTH_PASS) {
-        return true
-    } else {
-        return false
-    }
+    return user === AUTH_USER && pass === AUTH_PASS
 }
 
-// This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
     if (!isAuthenticated(request)) {
-        return new NextResponse('Authentication required', {
-            status: 401,
-            headers: { 'WWW-Authenticate': 'Basic' },
-        })
+        return NextResponse.json(
+            { message: 'Authentication required' },
+            {
+                status: 401,
+                headers: { 'WWW-Authenticate': 'Basic' },
+            },
+        )
     }
 
     return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
     matcher: '/((?!favicon.ico|api/health).*)',
 }

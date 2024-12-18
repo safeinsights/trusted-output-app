@@ -1,34 +1,24 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { POST } from '@/app/api/run/[runId]/upload/route'
+import { describe, expect, it, beforeEach } from 'vitest'
+import { POST } from './route'
 import { NextRequest } from 'next/server'
 import path from 'path'
 import fs from 'fs'
-import { rm } from 'fs/promises'
-import { UPLOAD_DIR } from '@/app/utils' // for cleanup
+import { UPLOAD_DIR } from '@/app/utils'
+import mockFs from 'mock-fs'
+import { v4 as uuidv4 } from 'uuid'
 
-// Ensure the upload directory exists
 beforeEach(() => {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-    }
-})
-
-// Clean up after each test
-afterEach(async () => {
-    await rm(UPLOAD_DIR, { recursive: true, force: true })
+    fs.rmSync(UPLOAD_DIR, { recursive: true, force: true })
 })
 
 describe('POST /api/run/[runId]/upload', () => {
     it('should upload a file successfully', async () => {
-        // Mock a CSV file as a Blob
         const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
-        const mockRunId = '123'
+        const mockRunId = uuidv4()
 
-        // Create a FormData object with the mock file
         const formData = new FormData()
         formData.append('file', new File([mockFile], mockRunId))
 
-        // Mock the NextRequest
         const req = {
             formData: async () => formData,
         } as NextRequest
@@ -48,15 +38,84 @@ describe('POST /api/run/[runId]/upload', () => {
     })
 
     it('should return failure if no file is uploaded', async () => {
-        // Empty FormData object
         const formData = new FormData()
 
         // Mock the NextRequest
         const req = {
             formData: async () => formData,
         } as NextRequest
-        const params = { runId: '123' }
+        const params = { runId: uuidv4() }
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data does not include expected file key')
+    })
+
+    it('should return failure if unexpected form data is included', async () => {
+        const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
+        const mockRunId = uuidv4()
+
+        const formData = new FormData()
+        formData.append('file', new File([mockFile], mockRunId))
+        formData.append('file2', new File([mockFile], mockRunId))
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = { runId: uuidv4() }
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data includes unexpected data keys')
+    })
+
+    it('should return failure if runId is not a UUID', async () => {
+        const mockRunId = '123'
+
+        const formData = new FormData()
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        const params = { runId: mockRunId }
+
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('runId is not a UUID')
+    })
+
+    it('should return an error if no runID is provided', async () => {
+        const formData = new FormData()
+
+        // Mock the NextRequest
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = {}
+        // @ts-ignore
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+    })
+
+    it('should return an error if the runID has results already', async () => {
+        const mockRunId = uuidv4()
+
+        mockFs({
+            [UPLOAD_DIR]: {
+                [mockRunId]: '',
+            },
+        })
+
+        const formData = new FormData()
+        formData.append('file', '')
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        const params = { runId: mockRunId }
+
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Data already exists for runId')
     })
 })
