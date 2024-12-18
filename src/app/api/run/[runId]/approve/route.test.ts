@@ -2,10 +2,11 @@ import { POST } from '@/app/api/run/[runId]/approve/route'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
+import { v4 } from 'uuid'
 
 describe('POST /api/run/:runId/approve', () => {
     const mockFileContent = 'header1,header2\nvalue1,value2'
-    const runId = 'test-run-id'
+    const runId = v4()
 
     beforeEach(() => {
         // Mock the file system with the necessary file

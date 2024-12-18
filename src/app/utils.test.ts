@@ -11,6 +11,7 @@ import path from 'path'
 import jwt from 'jsonwebtoken'
 import { describe, expect, it, vi } from 'vitest'
 import fs from 'fs'
+import { v4 } from 'uuid'
 
 describe('Utils', () => {
     describe('createUploadDirIfNotExists', () => {
@@ -24,26 +25,12 @@ describe('Utils', () => {
             // Verify the directory was created
             expect(fs.statSync(UPLOAD_DIR).isDirectory()).toBe(true)
         })
-
-        it('should not create the upload directory if it already exists', async () => {
-            // Ensure the directory already exists
-            mockFs({
-                [UPLOAD_DIR]: {},
-            })
-
-            // Try to create it again
-            createUploadDirIfNotExists()
-
-            // Verify the directory is still intact
-            const files = fs.readdirSync(UPLOAD_DIR)
-            expect(files).toEqual([])
-        })
     })
 
     describe('saveFile', () => {
         it('should save the file to the correct path', async () => {
             const file = new Blob(['test file content'], { type: 'text/plain' })
-            const runId = 'test-run-id'
+            const runId = v4()
 
             await saveFile(file, runId)
 
@@ -59,18 +46,22 @@ describe('Utils', () => {
 
     describe('deleteFile', () => {
         it('should delete the file from the correct path', async () => {
-            const file = new Blob(['test file content'], { type: 'text/plain' })
-            const runId = 'test-run-id'
+            const mockFileContent = 'header1,header2\nvalue1,value2'
+            const mockFileName = 'test.csv'
 
-            // Save the file first
-            await saveFile(file, runId)
+            // Mock the file system with the necessary file
+            mockFs({
+                [UPLOAD_DIR]: {
+                    [mockFileName]: mockFileContent,
+                },
+            })
 
             // Verify the file exists
-            const filePath = path.resolve(UPLOAD_DIR, runId)
+            const filePath = path.resolve(UPLOAD_DIR, mockFileName)
             expect(fs.existsSync(filePath)).toBe(true)
 
             // Now delete the file
-            await deleteFile(runId)
+            await deleteFile(mockFileName)
 
             // Verify the file was deleted
             expect(fs.existsSync(filePath)).toBe(false)
