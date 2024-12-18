@@ -1,7 +1,6 @@
 import { afterEach, beforeAll, beforeEach, vi } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
-import '@testing-library/jest-dom'
 
 const OLD_ENV = process.env
 

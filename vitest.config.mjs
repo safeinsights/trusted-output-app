@@ -3,11 +3,10 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 
-// https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react(), tsconfigPaths(), vanillaExtractPlugin()],
-    setupFiles: './vitest.setup.ts',
     test: {
+        setupFiles: ['./tests/vitest.setup.ts'],
         mockReset: true,
         environment: 'happy-dom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
