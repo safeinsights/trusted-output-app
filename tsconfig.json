@@ -20,7 +20,6 @@
         ],
         "paths": {
             "@/*": ["./src/*"],
-            "@/test-utils": ["./test-utils"]
         },
         "types": ["vitest/globals"]
     },
