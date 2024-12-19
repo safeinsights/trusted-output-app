@@ -8,25 +8,21 @@ import { parse } from 'csv-parse/sync'
 export const revalidate = 0
 
 export function GET() {
-    try {
-        const runs: Record<string, any[]> = {}
+    const runs: Record<string, any[]> = {}
 
-        if (fs.existsSync(UPLOAD_DIR)) {
-            const files = fs.readdirSync(UPLOAD_DIR)
+    if (fs.existsSync(UPLOAD_DIR)) {
+        const files = fs.readdirSync(UPLOAD_DIR)
 
-            for (const file of files) {
-                const filePath = path.join(UPLOAD_DIR, file)
-                const fileContent = fs.readFileSync(filePath, 'utf-8')
+        for (const file of files) {
+            const filePath = path.join(UPLOAD_DIR, file)
+            const fileContent = fs.readFileSync(filePath, 'utf-8')
 
-                runs[file] = parse(fileContent, {
-                    columns: true,
-                    skip_empty_lines: true,
-                })
-            }
+            runs[file] = parse(fileContent, {
+                columns: true,
+                skip_empty_lines: true,
+            })
         }
-
-        return NextResponse.json({ runs: runs })
-    } catch (error) {
-        return NextResponse.json({ error: 'Unable to read files' }, { status: 500 })
     }
+
+    return NextResponse.json({ runs: runs })
 }

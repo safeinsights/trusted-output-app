@@ -49,7 +49,7 @@ export const useApproveRun = () => {
             notifications.show({
                 color: 'red',
                 title: 'Study Run Approval Failed',
-                message: `An error occured while approving the study run. ${error.message}. Please retry later.`,
+                message: `An error occurred while approving the study run. ${error.message}. Please retry later.`,
                 autoClose: 5_000,
                 position: 'top-right',
             })

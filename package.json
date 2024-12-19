@@ -24,8 +24,10 @@
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "@playwright/test": "^1.46",
+        "@tanstack/query-core": "^5.62.3",
         "@testing-library/react": "^16.0",
         "@types/jsonwebtoken": "^9.0.7",
+        "@types/mock-fs": "^4.13.4",
         "@types/react": "18.3",
         "@vanilla-extract/vite-plugin": "^4.0.13",
         "@vitejs/plugin-react": "^4.3.1",
@@ -35,6 +37,8 @@
         "eslint-config-next": "*",
         "eslint-config-prettier": "*",
         "happy-dom": ">=15.10.2",
+        "jsdom": "^25.0.1",
+        "mock-fs": "^5.4.1",
         "npm-run-all": "*",
         "prettier": "*",
         "vite-tsconfig-paths": "^5.0.1",
@@ -54,6 +58,7 @@
         "jsonwebtoken": "^9.0.2",
         "mantine-datatable": "^7.12.4",
         "multer": "^1.4.5-lts.1",
-        "next-swagger-doc": "^0.4"
+        "next-swagger-doc": "^0.4",
+        "uuid": "^11.0.3"
     }
 }
