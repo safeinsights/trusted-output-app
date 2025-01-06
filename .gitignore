@@ -1,19 +1,38 @@
+# Environment files
+.env
+.env.*
+
+# System files
 .DS_Store
 .idea
-*.log
-tmp/
-.env
-.next/
-test-results/
 *.tern-port
-node_modules/
+
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.tsbuildinfo
+
+# Temporary files and directories
+tmp/
+node_modules/
 .npm
+*.tsbuildinfo
 .eslintcache
+
+# Build outputs
+.next/
 coverage/
 playwright-report/
+
+# Test results
+test-results/
+
+# Public uploads
 public/uploads/*
+
+# Security keys
 *.pem
+
+# Generated styles
+src/styles/generated

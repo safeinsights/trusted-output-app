@@ -1,0 +1,17 @@
+FROM node:22-bookworm AS base
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npx playwright install
+RUN npx playwright install-deps
+
+RUN npm install
+
+# Next.js collects completely anonymous telemetry data about general usage. Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line to disable telemetry at run time
+ENV NEXT_TELEMETRY_DISABLED=1
+
+
+CMD ["npm run dev"]

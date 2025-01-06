@@ -8,6 +8,7 @@ export default defineConfig({
     test: {
         setupFiles: ['./tests/vitest.setup.ts'],
         mockReset: true,
+        reporters: process.env.CI ? ['basic', 'github-actions'] : ['verbose'],
         environment: 'happy-dom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
         exclude: ['src/components/providers.test.tsx'],
@@ -19,7 +20,7 @@ export default defineConfig({
                 lines: true,
             },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
-            exclude: ['src/components/providers.tsx'],
+            exclude: ['src/components/providers.tsx', 'src/styles/**/*.ts'],
             reportOnFailure: true,
         },
     },

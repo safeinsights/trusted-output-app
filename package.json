@@ -4,13 +4,15 @@
     "description": "Trusted Output App",
     "main": "index.js",
     "scripts": {
-        "dev": "next dev -p 3002",
+        "dev": "next dev --turbopack -p 3002",
         "build": "next build",
         "start": "next start -p 3002",
         "docker:build": "docker build -t trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
         "typecheck": "tsc --noEmit",
+        "pre:push": "run-s lint:fix checks",
+        "pre:commit": "npx lint-staged",
         "checks": "run-p -c typecheck lint",
         "test:e2e": "playwright test",
         "test:unit": "vitest",
@@ -45,20 +47,23 @@
         "vitest": "*"
     },
     "dependencies": {
-        "@clerk/nextjs": "^5.3.1",
-        "@mantine/core": "^7.13",
-        "@mantine/form": "^7.13",
-        "@mantine/modals": "^7.13",
+        "@clerk/nextjs": "^6.9.1",
+        "@mantine/core": "^7.15",
+        "@mantine/form": "^7.15",
+        "@mantine/modals": "^7.15",
         "@mantine/notifications": "^7.13.2",
         "@tanstack/react-query": "^5.59.20",
         "@vanilla-extract/css": "^1.15",
         "@vanilla-extract/next-plugin": "^2.4",
         "clsx": "*",
+        "next": "15.1.0",
         "csv-parse": "^5.5.6",
         "jsonwebtoken": "^9.0.2",
         "mantine-datatable": "^7.12.4",
         "multer": "^1.4.5-lts.1",
         "next-swagger-doc": "^0.4",
-        "uuid": "^11.0.3"
+        "uuid": "^11.0.3",
+        "react": "19.0.0",
+        "react-dom": "19.0.0"
     }
 }

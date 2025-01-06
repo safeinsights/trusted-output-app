@@ -20,7 +20,8 @@
         ],
         "paths": {
             "@/*": ["./src/*"],
-            "@/test-utils": ["./test-utils"]
+            "@/test-utils": ["./test-utils"],
+            "@/tests/*": ["./tests/*"]
         },
         "types": ["vitest/globals"]
     },
