@@ -3,8 +3,8 @@ import { deleteFile, generateAuthorizationHeaders, UPLOAD_DIR } from '@/app/util
 import path from 'path'
 import fs from 'fs'
 
-export const POST = async (req: NextRequest, { params }: { params: { runId: string } }) => {
-    const runId = params.runId
+export async function POST(request: NextRequest, { params }: { params: Promise<{ runId: string }> }) {
+    const runId = (await params).runId
 
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
@@ -34,6 +34,5 @@ export const POST = async (req: NextRequest, { params }: { params: { runId: stri
         return NextResponse.json({ success: true }, { status: 200 })
     }
 
-    // TODO What status code? 404?
-    return NextResponse.json({ error: 'No file exists to delete' }, { status: 400 })
+    return NextResponse.json({ error: 'No file exists to delete' }, { status: 404 })
 }
