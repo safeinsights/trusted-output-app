@@ -36,7 +36,7 @@ describe('POST /api/run/:runId/approve', () => {
         const res = await POST(req as any, { params: { runId: 'non-existent-run' } })
 
         // Check status
-        expect(res.status).toBe(400)
+        expect(res.status).toBe(404)
 
         // Check JSON payload
         const data = await res.json()
