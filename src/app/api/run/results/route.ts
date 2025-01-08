@@ -8,7 +8,7 @@ import { parse } from 'csv-parse/sync'
 export const revalidate = 0
 
 export function GET() {
-    const runs: Record<string, any[]> = {}
+    const runs: Record<string, any[]> = {} // eslint-disable-line
 
     if (fs.existsSync(UPLOAD_DIR)) {
         const files = fs.readdirSync(UPLOAD_DIR)

@@ -13,6 +13,7 @@ export default [
     },
     ...compat.extends('next/core-web-vitals'),
     ...compat.extends('next/typescript'),
+    ...compat.extends('prettier'),
     {
         rules: {
             'no-console': ['error', { allow: ['warn', 'error'] }],

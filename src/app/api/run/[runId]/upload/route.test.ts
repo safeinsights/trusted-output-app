@@ -23,8 +23,7 @@ describe('POST /api/run/[runId]/upload', () => {
             formData: async () => formData,
         } as NextRequest
 
-        const params = { runId: mockRunId }
-
+        const params = Promise.resolve({ runId: mockRunId })
         const response = await POST(req, { params })
         expect(response.status).toBe(200)
 
@@ -44,7 +43,7 @@ describe('POST /api/run/[runId]/upload', () => {
         const req = {
             formData: async () => formData,
         } as NextRequest
-        const params = { runId: uuidv4() }
+        const params = Promise.resolve({ runId: uuidv4() })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Form data does not include expected file key')
@@ -61,7 +60,7 @@ describe('POST /api/run/[runId]/upload', () => {
         const req = {
             formData: async () => formData,
         } as NextRequest
-        const params = { runId: uuidv4() }
+        const params = Promise.resolve({ runId: uuidv4() })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Form data includes unexpected data keys')
@@ -76,8 +75,7 @@ describe('POST /api/run/[runId]/upload', () => {
             formData: async () => formData,
         } as NextRequest
 
-        const params = { runId: mockRunId }
-
+        const params = Promise.resolve({ runId: mockRunId })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('runId is not a UUID')
@@ -90,8 +88,7 @@ describe('POST /api/run/[runId]/upload', () => {
         const req = {
             formData: async () => formData,
         } as NextRequest
-        const params = {}
-        // @ts-ignore
+        const params = Promise.resolve({ runId: '' })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
     })
@@ -112,10 +109,27 @@ describe('POST /api/run/[runId]/upload', () => {
             formData: async () => formData,
         } as NextRequest
 
-        const params = { runId: mockRunId }
-
+        const params = Promise.resolve({ runId: mockRunId })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Data already exists for runId')
+    })
+
+    it('should fall through and 400 if all conditions fail', async () => {
+        const mockRunId = uuidv4()
+
+        // Create form data with a 'file' key that is not a valid File object
+        const formData = new FormData()
+        formData.append('file', 'not-a-file')
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        const params = Promise.resolve({ runId: mockRunId })
+        const response = await POST(req, { params })
+
+        expect(response.status).toBe(400)
+        expect(await response.json()).toEqual({})
     })
 })
