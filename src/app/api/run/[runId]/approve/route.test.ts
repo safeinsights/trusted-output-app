@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
 import { v4 } from 'uuid'
+import { NextRequest } from 'next/server'
 
 describe('POST /api/run/:runId/approve', () => {
     const mockFileContent = 'header1,header2\nvalue1,value2'
@@ -18,9 +19,9 @@ describe('POST /api/run/:runId/approve', () => {
     })
 
     it('should return 400 if runId is missing', async () => {
-        const req = new Request('http://localhost', { method: 'POST' })
-        // @ts-ignore
-        const res = await POST(req as any, { params: {} })
+        const req = new NextRequest('http://localhost', { method: 'POST' })
+        const params = Promise.resolve({ runId: '' })
+        const res = await POST(req, { params })
 
         // Check status
         expect(res.status).toBe(400)
@@ -32,11 +33,12 @@ describe('POST /api/run/:runId/approve', () => {
             [UPLOAD_DIR]: {}, // Empty the directory to simulate no file for 'runId'
         })
 
-        const req = new Request('http://localhost', { method: 'POST' })
-        const res = await POST(req as any, { params: { runId: 'non-existent-run' } })
+        const req = new NextRequest('http://localhost', { method: 'POST' })
+        const params = Promise.resolve({ runId: 'non-existent-run' })
+        const res = await POST(req, { params })
 
         // Check status
-        expect(res.status).toBe(400)
+        expect(res.status).toBe(404)
 
         // Check JSON payload
         const data = await res.json()
@@ -47,8 +49,9 @@ describe('POST /api/run/:runId/approve', () => {
         // Mock the fetch call to simulate failure
         vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: false }))
 
-        const req = new Request('http://localhost', { method: 'POST' })
-        const res = await POST(req as any, { params: { runId } })
+        const req = new NextRequest('http://localhost', { method: 'POST' })
+        const params = Promise.resolve({ runId })
+        const res = await POST(req, { params })
 
         // Check status
         expect(res.status).toBe(500)
@@ -62,8 +65,9 @@ describe('POST /api/run/:runId/approve', () => {
         // Mock the fetch call to simulate success
         vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true }))
 
-        const req = new Request('http://localhost', { method: 'POST' })
-        const res = await POST(req as any, { params: { runId } })
+        const req = new NextRequest('http://localhost', { method: 'POST' })
+        const params = Promise.resolve({ runId })
+        const res = await POST(req, { params })
 
         // Check status
         expect(res.status).toBe(200)

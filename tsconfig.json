@@ -19,7 +19,9 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@/test-utils": ["./test-utils"],
+            "@/tests/*": ["./tests/*"]
         },
         "types": ["vitest/globals"]
     },

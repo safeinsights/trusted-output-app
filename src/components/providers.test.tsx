@@ -10,7 +10,7 @@ const mockIsServer = vi.fn(() => false)
 vi.mock('@tanstack/react-query', async (importOriginal) => {
     const actual = await importOriginal()
     return {
-        // @ts-ignore
+        // @ts-expect-error Ignore the type error
         ...actual,
         isServer: () => mockIsServer(),
     }

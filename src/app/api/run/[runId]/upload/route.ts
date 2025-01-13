@@ -3,14 +3,14 @@ import { saveFile, UPLOAD_DIR, isValidUUID } from '@/app/utils'
 import path from 'path'
 import fs from 'fs'
 
-function isFile(obj: any): obj is File {
+function isFile(obj: FormDataEntryValue): obj is File {
     return obj instanceof File
 }
 
-export const POST = async (req: NextRequest, { params }: { params: { runId: string } }) => {
+export const POST = async (req: NextRequest, { params }: { params: Promise<{ runId: string }> }) => {
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
-    const runId = params.runId
+    const runId = (await params).runId
 
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
