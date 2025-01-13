@@ -50,10 +50,10 @@ export const isValidUUID = (value: string): boolean => {
     return uuidValidate(value)
 }
 
-export const log = (message: string, level: 'info' | 'error' = 'info', error: Error | undefined=undefined) => {
+export const log = (message: string, level: 'info' | 'error' = 'info', error: Error | undefined = undefined) => {
     if (error) {
         console.error(`[${level.toUpperCase()}] - ${message} - ${error.message}`)
-    } else if (process.env.NODE_ENV === 'development') {
+    } else if (process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true') {
         console[level](`[${level.toUpperCase()}] - ${message}`)
     }
 }
