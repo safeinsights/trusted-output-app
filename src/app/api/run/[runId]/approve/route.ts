@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteFile, generateAuthorizationHeaders, UPLOAD_DIR } from '@/app/utils'
+import { deleteFile, generateAuthorizationHeaders, UPLOAD_DIR, log } from '@/app/utils'
 import path from 'path'
 import fs from 'fs'
 
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
     }
-
+    log(`Retrieving results for run ID: ${runId}`)
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
         const fileBuffer = await fs.promises.readFile(filePath)
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         })
 
         if (!response.ok) {
+            log(`Unable to post file for run ID ${runId}`, 'error')
             return NextResponse.json({ error: 'Unable to post file' }, { status: 500 })
         }
 

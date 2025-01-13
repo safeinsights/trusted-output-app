@@ -16,7 +16,8 @@ export default [
     ...compat.extends('prettier'),
     {
         rules: {
-            'no-console': ['error', { allow: ['warn', 'error'] }],
+            // Removing the no-console rule as we can use a wrapper that checks the environment before logging
+            // 'no-console': ['error', { allow: ['warn', 'error', 'log'] }],
             'no-unused-vars': ['error', { ignoreRestSiblings: true, varsIgnorePattern: '_+', argsIgnorePattern: '^_' }],
             semi: ['error', 'never'],
         },
