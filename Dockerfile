@@ -23,4 +23,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhos
 EXPOSE 3002
 
 # Start the Next.js app in production mode
-CMD ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["npm", "run", "start"]
