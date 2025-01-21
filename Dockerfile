@@ -7,7 +7,7 @@ RUN apk --no-cache add curl
 WORKDIR /app
 
 # Copy the package.json and lock file to install dependencies
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json panda.config.ts ./
 
 # Install dependencies
 RUN npm install

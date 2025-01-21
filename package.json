@@ -8,7 +8,7 @@
         "build": "next build",
         "start": "next start -p 3002",
         "prepare": "panda codegen",
-        "docker:build": "docker build -t trusted-output-app .",
+        "docker:build": "docker build --platform=linux/amd64 -t trusted-output-app .",
         "lint": "next lint && prettier --check .",
         "lint:fix": "next lint --fix && prettier --write .",
         "typecheck": "tsc --noEmit",
