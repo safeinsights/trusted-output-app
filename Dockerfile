@@ -7,7 +7,7 @@ RUN apk --no-cache add curl
 WORKDIR /app
 
 # Copy the package.json and lock file to install dependencies
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json panda.config.ts ./
 
 # Install dependencies
 RUN npm install
@@ -23,4 +23,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhos
 EXPOSE 3002
 
 # Start the Next.js app in production mode
-CMD ["npm", "run", "start"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
