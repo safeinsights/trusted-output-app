@@ -10,7 +10,6 @@ describe('RootLayout', () => {
             </RootLayout>,
         )
 
-        // Assert that the child is rendered
         const child = screen.getByTestId('test-child')
         expect(child).not.toBeNull()
         expect(child.textContent).toBe('Test Content')

@@ -40,6 +40,5 @@ export function renderHookWithProviders<T>(callback: () => T) {
     return renderHook(callback, { wrapper })
 }
 
-// Test utils
 export * from '@testing-library/react'
 export { renderWithProviders as render, renderHookWithProviders as renderHook }
