@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render } from '@/tests/test-utils'
 import { SafeInsightsLogo } from './si-logo'
 import { describe, it, expect } from 'vitest'
 

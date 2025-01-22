@@ -19,7 +19,7 @@ export default defineConfig({
                 lines: true,
             },
             include: ['src/**/*.{js,jsx,ts,tsx}'],
-            exclude: ['src/components/providers.tsx', 'src/styles/**/*.ts'],
+            exclude: ['src/components/providers.tsx', 'src/styles/**/*.ts', 'src/**/*.test.{js,jsx,ts,tsx}'],
             reportOnFailure: true,
         },
     },
