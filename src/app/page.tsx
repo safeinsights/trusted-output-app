@@ -9,12 +9,12 @@ import { Results } from '@/components/results'
 export default function Home() {
     const { data: runs = {}, isLoading, isError, error } = useRunResults()
 
-    if (isError) {
-        return <div>Error: {error.toString()}</div>
+    if (isLoading) {
+        return <LoadingOverlay visible={true} />
     }
 
-    if (isLoading) {
-        return <LoadingOverlay />
+    if (isError) {
+        return <div>Error: {error.toString()}</div>
     }
 
     if (Object.entries(runs).length === 0) {

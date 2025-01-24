@@ -1,37 +1,27 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@/tests/test-utils'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Home from './page'
 import * as requests from './requests'
+import { useRunResults } from './requests'
 
-vi.mock('./requests', async () => {
-    const actual = await vi.importActual('./requests')
-    return {
-        ...actual,
-        useRunResults: vi.fn(),
-        useApproveRun: vi.fn(),
-    }
-})
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            retry: false,
-        },
-    },
-})
+vi.mock('@/app/requests', () => ({
+    useRunResults: vi.fn(),
+    useApproveRun: vi.fn(),
+}))
 
 describe('Home', () => {
-    it('shows loading state', () => {
-        vi.mocked(requests.useRunResults).mockReturnValue({
-            data: undefined,
+    it('shows the loading overlay when loading', () => {
+        vi.mocked(useRunResults).mockReturnValue({
             isLoading: true,
             isError: false,
+            data: undefined,
             error: null,
-        } as any)
+        } as never)
 
-        const { container } = render(<Home />)
-        expect(container.querySelector('.mantine-LoadingOverlay-root')).toBeDefined()
+        render(<Home />)
+
+        const loadingOverlay = document.querySelector('.mantine-LoadingOverlay-root')
+        expect(loadingOverlay).toBeDefined()
     })
 
     it('shows error state', () => {
@@ -40,7 +30,7 @@ describe('Home', () => {
             isLoading: false,
             isError: true,
             error: new Error('Test error'),
-        } as any)
+        } as never)
 
         render(<Home />)
         expect(screen.getByText('Error: Error: Test error')).toBeDefined()
@@ -52,7 +42,7 @@ describe('Home', () => {
             isLoading: false,
             isError: false,
             error: null,
-        } as any)
+        } as never)
 
         render(<Home />)
         expect(screen.getByText('No Study result is available at this time.')).not.toBeNull()
@@ -68,11 +58,11 @@ describe('Home', () => {
             isLoading: false,
             isError: false,
             error: null,
-        } as any)
+        } as never)
 
         vi.mocked(requests.useApproveRun).mockReturnValue({
             mutate: vi.fn(),
-        } as any)
+        } as never)
 
         render(<Home />)
 

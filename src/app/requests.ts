@@ -5,7 +5,7 @@ export interface CSVRecord {
     [key: string]: string
 }
 
-interface RunData {
+export interface RunData {
     [fileName: string]: CSVRecord[]
 }
 
