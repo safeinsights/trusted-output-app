@@ -31,5 +31,5 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ run
         return NextResponse.json({}, { status: 200 })
     }
     log(errorMessage, 'error')
-    return NextResponse.json({error: errorMessage}, { status: 400 })
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
 }
