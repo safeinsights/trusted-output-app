@@ -1,20 +1,20 @@
 'use client'
 
-import { FC } from 'react'
-import { Alert, Button, LoadingOverlay, Modal, Paper, ScrollArea, Stack, Title } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import { Alert, LoadingOverlay, Paper, Stack, Title } from '@mantine/core'
 import { DataTable } from 'mantine-datatable'
-import { CSVRecord, useApproveRun, useRunResults } from '@/app/requests'
+import { useRunResults } from '@/app/requests'
+import { Approve } from '@/components/approve-button'
+import { Results } from '@/components/results'
 
 export default function Home() {
     const { data: runs = {}, isLoading, isError, error } = useRunResults()
 
-    if (isError) {
-        return <div>Error: {error.toString()}</div>
+    if (isLoading) {
+        return <LoadingOverlay visible={true} />
     }
 
-    if (isLoading) {
-        return <LoadingOverlay />
+    if (isError) {
+        return <div>Error: {error.toString()}</div>
     }
 
     if (Object.entries(runs).length === 0) {
@@ -63,47 +63,5 @@ export default function Home() {
                 </Paper>
             </Stack>
         </Stack>
-    )
-}
-
-const Approve: FC<{ fileName: string }> = ({ fileName }) => {
-    const approve = useApproveRun()
-    return <Button onClick={() => approve.mutate(fileName)}>Approve</Button>
-}
-
-const Results: FC<{ fileName: string; records: CSVRecord[] }> = ({ fileName, records }) => {
-    const [opened, { open, close }] = useDisclosure(false)
-    const columns = Object.keys(records[0]).map((key: string) => ({
-        accessor: key,
-        title: key,
-    }))
-
-    return (
-        <>
-            <Modal
-                opened={opened}
-                onClose={close}
-                size="100%"
-                title={`Results for ${fileName}`}
-                scrollAreaComponent={ScrollArea.Autosize}
-                overlayProps={{
-                    backgroundOpacity: 0.55,
-                    blur: 3,
-                }}
-                centered
-            >
-                <DataTable
-                    idAccessor={columns[0].title}
-                    withTableBorder={false}
-                    withColumnBorders={true}
-                    records={records}
-                    columns={columns}
-                />
-            </Modal>
-
-            <Button variant="outline" onClick={open}>
-                View Results
-            </Button>
-        </>
     )
 }
