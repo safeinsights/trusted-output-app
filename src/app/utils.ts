@@ -27,7 +27,7 @@ export const deleteFile = async (runId: string) => {
 }
 
 export const generateAuthorizationHeaders = () => {
-    log('Generating authorization headers')
+    log('BMA: Generating authorization headers')
     // Generate JWT token
     const privateKey = process.env.MANAGEMENT_APP_PRIVATE_KEY
     const memberId = process.env.MANAGEMENT_APP_MEMBER_ID

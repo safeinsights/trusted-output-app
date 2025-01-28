@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
-import fs from 'fs'
 import { UPLOAD_DIR, log } from '@/app/utils'
+import fs from 'fs'
+import { NextResponse } from 'next/server'
 import path from 'path'
 
 // This disables caching for this endpoint
@@ -12,7 +12,7 @@ interface Run {
 
 export function GET() {
     let runs: Run[] = []
-    log(`Retrieving run ids...`)
+    log(`TOA: Retrieving run ids from filesystem...`)
     if (fs.existsSync(UPLOAD_DIR)) {
         const files = fs.readdirSync(UPLOAD_DIR)
         runs = files.map((file) => {
