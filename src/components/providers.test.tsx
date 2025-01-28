@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { render } from '@/tests/test-utils'
 import { getQueryClient, Providers } from './providers'
 import { QueryClient } from '@tanstack/react-query'
 
