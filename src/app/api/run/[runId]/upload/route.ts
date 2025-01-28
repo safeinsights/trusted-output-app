@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { saveFile, UPLOAD_DIR, isValidUUID, log } from '@/app/utils'
-import path from 'path'
+import { isValidUUID, log, saveFile, UPLOAD_DIR } from '@/app/utils'
 import fs from 'fs'
+import { NextRequest, NextResponse } from 'next/server'
+import path from 'path'
 
 function isFile(obj: FormDataEntryValue): obj is File {
     return obj instanceof File
@@ -31,5 +31,5 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ run
         return NextResponse.json({}, { status: 200 })
     }
     log(errorMessage, 'error')
-    return NextResponse.json({}, { status: 400 })
+    return NextResponse.json({error: errorMessage}, { status: 400 })
 }
