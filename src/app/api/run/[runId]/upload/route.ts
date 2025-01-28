@@ -11,7 +11,7 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ run
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
     const runId = (await params).runId
-    let errorMessage = 'An error occured!'
+    let errorMessage = ''
 
     if (!runId) {
         errorMessage = 'Missing runId'
