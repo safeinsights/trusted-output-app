@@ -7,6 +7,7 @@ import { validate as uuidValidate } from 'uuid'
 export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
 
 export const createUploadDirIfNotExists = () => {
+    log(`Creating upload directory at ${UPLOAD_DIR}`)
     if (!fs.existsSync(UPLOAD_DIR)) {
         fs.mkdirSync(UPLOAD_DIR, { recursive: true })
     }
@@ -14,16 +15,19 @@ export const createUploadDirIfNotExists = () => {
 
 export const saveFile = async (file: Blob, runId: string) => {
     createUploadDirIfNotExists()
+    log(`Saving file for run ID: ${runId}`)
     const buffer = Buffer.from(await file.arrayBuffer())
     fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
 }
 
 export const deleteFile = async (runId: string) => {
     createUploadDirIfNotExists()
+    log(`Deleting file for run ID: ${runId}`)
     fs.unlinkSync(path.resolve(UPLOAD_DIR, runId))
 }
 
 export const generateAuthorizationHeaders = () => {
+    log('BMA: Generating authorization headers')
     // Generate JWT token
     const privateKey = process.env.MANAGEMENT_APP_PRIVATE_KEY
     const memberId = process.env.MANAGEMENT_APP_MEMBER_ID
@@ -44,4 +48,12 @@ export const generateAuthorizationHeaders = () => {
 
 export const isValidUUID = (value: string): boolean => {
     return uuidValidate(value)
+}
+
+export const log = (message: string, level: 'info' | 'error' = 'info', error: Error | undefined = undefined) => {
+    if (error) {
+        console.error(`[${level.toUpperCase()}] - ${message} - ${error.message}`)
+    } else if (process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true') {
+        console[level](`[${level.toUpperCase()}] - ${message}`)
+    }
 }

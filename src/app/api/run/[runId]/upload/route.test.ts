@@ -130,6 +130,6 @@ describe('POST /api/run/[runId]/upload', () => {
         const response = await POST(req, { params })
 
         expect(response.status).toBe(400)
-        expect(await response.json()).toEqual({})
+        expect((await response.json()).error).toEqual('')
     })
 })

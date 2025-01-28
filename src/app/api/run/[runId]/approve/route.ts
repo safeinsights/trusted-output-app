@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { deleteFile, generateAuthorizationHeaders, UPLOAD_DIR } from '@/app/utils'
-import path from 'path'
+import { deleteFile, generateAuthorizationHeaders, log, UPLOAD_DIR } from '@/app/utils'
 import fs from 'fs'
+import { NextRequest, NextResponse } from 'next/server'
+import path from 'path'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ runId: string }> }) {
     const runId = (await params).runId
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!runId) {
         return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
     }
-
+    log(`Retrieving results for run ID: ${runId}`)
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
         const fileBuffer = await fs.promises.readFile(filePath)
@@ -18,6 +18,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         formData.append('file', new File([fileBuffer], runId, { type: 'text/csv' }))
 
         const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${runId}/results`
+        log(`BMA: Uploading results ${endpoint}`)
         const response = await fetch(endpoint, {
             method: 'POST',
             body: formData,
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         })
 
         if (!response.ok) {
+            log(`BMA: Unable to post file for run ID ${runId}`, 'error')
             return NextResponse.json({ error: 'Unable to post file' }, { status: 500 })
         }
 

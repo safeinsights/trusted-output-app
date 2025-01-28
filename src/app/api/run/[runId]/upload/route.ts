@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { saveFile, UPLOAD_DIR, isValidUUID } from '@/app/utils'
-import path from 'path'
+import { isValidUUID, log, saveFile, UPLOAD_DIR } from '@/app/utils'
 import fs from 'fs'
+import { NextRequest, NextResponse } from 'next/server'
+import path from 'path'
 
 function isFile(obj: FormDataEntryValue): obj is File {
     return obj instanceof File
@@ -11,32 +11,25 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ run
     const formData = await req.formData()
     const body = Object.fromEntries(formData)
     const runId = (await params).runId
+    let errorMessage = ''
 
     if (!runId) {
-        return NextResponse.json({ error: 'Missing runId' }, { status: 400 })
+        errorMessage = 'Missing runId'
+    } else if (!isValidUUID(runId)) {
+        errorMessage = 'runId is not a UUID'
+    } else if (!('file' in body)) {
+        errorMessage = 'Form data does not include expected file key'
+    } else if (Object.keys(body).length !== 1) {
+        errorMessage = 'Form data includes unexpected data keys'
     }
-
-    if (!isValidUUID(runId)) {
-        return NextResponse.json({ error: 'runId is not a UUID' }, { status: 400 })
-    }
-
-    if (!('file' in body)) {
-        return NextResponse.json({ error: 'Form data does not include expected file key' }, { status: 400 })
-    }
-
-    if (Object.keys(body).length !== 1) {
-        return NextResponse.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
-    }
-
     const filePath = path.join(UPLOAD_DIR, runId)
     if (fs.existsSync(filePath)) {
-        return NextResponse.json({ error: 'Data already exists for runId' }, { status: 400 })
+        errorMessage = 'Data already exists for runId'
     }
-
-    if ('file' in body && isFile(body.file)) {
+    if (errorMessage.length == 0 && 'file' in body && isFile(body.file)) {
         await saveFile(body.file, runId)
         return NextResponse.json({}, { status: 200 })
     }
-
-    return NextResponse.json({}, { status: 400 })
+    log(errorMessage, 'error')
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
 }
