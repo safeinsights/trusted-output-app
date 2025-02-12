@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { PUT } from '@/app/api/run/[runId]/route'
+import { AllowedStatusUpdates, PUT } from '@/app/api/run/[runId]/route'
 import { v4 } from 'uuid'
 import { NextRequest } from 'next/server'
 
@@ -30,7 +30,7 @@ describe('PUT /api/run/:runId', () => {
         // PROVISIONING does not allow message
         req = new NextRequest('http://localhost', {
             method: 'PUT',
-            body: JSON.stringify({ status: 'PROVISIONING', message: 'message' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_PROVISIONING, message: 'message' }),
         })
         res = await PUT(req, { params })
 
@@ -41,7 +41,7 @@ describe('PUT /api/run/:runId', () => {
         // When allowed message should be string
         req = new NextRequest('http://localhost', {
             method: 'PUT',
-            body: JSON.stringify({ status: 'ERRORED', message: 12 }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_ERRORED, message: 12 }),
         })
         res = await PUT(req, { params })
 
@@ -74,7 +74,7 @@ describe('PUT /api/run/:runId', () => {
 
         const req = new NextRequest('http://localhost', {
             method: 'PUT',
-            body: JSON.stringify({ status: 'RUNNING' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING }),
         })
         const params = Promise.resolve({ runId: runId })
         const res = await PUT(req, { params })
@@ -83,7 +83,7 @@ describe('PUT /api/run/:runId', () => {
         expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
-            body: JSON.stringify({ status: 'RUNNING' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING }),
         })
         expect(res.status).toBe(200)
     })
@@ -102,7 +102,7 @@ describe('PUT /api/run/:runId', () => {
 
         const req = new NextRequest('http://localhost', {
             method: 'PUT',
-            body: JSON.stringify({ status: 'RUNNING', message: 'message' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING, message: 'message' }),
         })
         const params = Promise.resolve({ runId: runId })
         const res = await PUT(req, { params })
@@ -111,7 +111,7 @@ describe('PUT /api/run/:runId', () => {
         expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
-            body: JSON.stringify({ status: 'RUNNING', message: 'message' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING, message: 'message' }),
         })
         expect(res.status).toBe(200)
     })
@@ -130,7 +130,7 @@ describe('PUT /api/run/:runId', () => {
 
         const req = new NextRequest('http://localhost', {
             method: 'PUT',
-            body: JSON.stringify({ status: 'RUNNING' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING }),
         })
         const params = Promise.resolve({ runId: runId })
         const res = await PUT(req, { params })
@@ -139,7 +139,7 @@ describe('PUT /api/run/:runId', () => {
         expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
-            body: JSON.stringify({ status: 'RUNNING' }),
+            body: JSON.stringify({ status: AllowedStatusUpdates.JOB_RUNNING }),
         })
         expect(res.status).toBe(500)
     })

@@ -1,25 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAuthorizationHeaders } from '@/app/utils'
 
-enum AllowedStatusUpdates {
-    // eslint-disable-next-line no-unused-vars
-    PROVISIONING = 'PROVISIONING',
-    // eslint-disable-next-line no-unused-vars
-    RUNNING = 'RUNNING',
-    // eslint-disable-next-line no-unused-vars
-    ERRORED = 'ERRORED',
+export enum AllowedStatusUpdates {
+    JOB_PROVISIONING = 'JOB-PROVISIONING',
+    JOB_RUNNING = 'JOB-RUNNING',
+    JOB_ERRORED = 'JOB-ERRORED',
 }
 
 type RunStatusUpdateRequest =
     | {
-          status: AllowedStatusUpdates.PROVISIONING
+          status: AllowedStatusUpdates.JOB_PROVISIONING
       }
     | {
-          status: AllowedStatusUpdates.RUNNING
+          status: AllowedStatusUpdates.JOB_RUNNING
           message?: string
       }
     | {
-          status: AllowedStatusUpdates.ERRORED
+          status: AllowedStatusUpdates.JOB_ERRORED
           message?: string
       }
 
@@ -33,12 +30,12 @@ function isRunStatusUpdateRequest(data: any): data is RunStatusUpdateRequest {
         return false
     }
 
-    if (data.status === AllowedStatusUpdates.PROVISIONING && data.message !== undefined) {
+    if (data.status === AllowedStatusUpdates.JOB_PROVISIONING && data.message !== undefined) {
         return false
     }
 
     if (
-        (data.status === AllowedStatusUpdates.RUNNING || data.status === AllowedStatusUpdates.ERRORED) &&
+        (data.status === AllowedStatusUpdates.JOB_RUNNING || data.status === AllowedStatusUpdates.JOB_ERRORED) &&
         data.message !== undefined &&
         typeof data.message !== 'string'
     ) {
