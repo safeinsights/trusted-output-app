@@ -1,20 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAuthorizationHeaders } from '@/app/utils'
 
-const allowedStatusUpdates = ['PROVISIONING', 'RUNNING', 'ERRORED'] as const
-
-type RunStatusUpdateRequest = {
-    status: (typeof allowedStatusUpdates)[number]
+export enum AllowedStatusUpdates {
+    JOB_PROVISIONING = 'JOB-PROVISIONING',
+    JOB_RUNNING = 'JOB-RUNNING',
+    JOB_ERRORED = 'JOB-ERRORED',
 }
+
+type RunStatusUpdateRequest =
+    | {
+          status: AllowedStatusUpdates.JOB_PROVISIONING
+      }
+    | {
+          status: AllowedStatusUpdates.JOB_RUNNING
+          message?: string
+      }
+    | {
+          status: AllowedStatusUpdates.JOB_ERRORED
+          message?: string
+      }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isRunStatusUpdateRequest(data: any): data is RunStatusUpdateRequest {
-    return (
-        typeof data === 'object' &&
-        data !== null &&
-        typeof data.status === 'string' &&
-        allowedStatusUpdates.includes(data.status)
-    )
+    if (typeof data !== 'object' || data === null || typeof data.status !== 'string') {
+        return false
+    }
+
+    if (!Object.values(AllowedStatusUpdates).includes(data.status)) {
+        return false
+    }
+
+    if (data.status === AllowedStatusUpdates.JOB_PROVISIONING && data.message !== undefined) {
+        return false
+    }
+
+    if (
+        (data.status === AllowedStatusUpdates.JOB_RUNNING || data.status === AllowedStatusUpdates.JOB_ERRORED) &&
+        data.message !== undefined &&
+        typeof data.message !== 'string'
+    ) {
+        return false
+    }
+
+    return true
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ runId: string }> }) {
@@ -33,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/run/${runId}`
     const response = await fetch(endpoint, {
         method: 'PUT',
-        body: JSON.stringify({ status: requestData.status }),
+        body: JSON.stringify(requestData),
         headers: {
             ...generateAuthorizationHeaders(),
         },
