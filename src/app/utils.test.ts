@@ -30,12 +30,12 @@ describe('Utils', () => {
     describe('saveFile', () => {
         it('should save the file to the correct path', async () => {
             const file = new Blob(['test file content'], { type: 'text/plain' })
-            const runId = v4()
+            const jobId = v4()
 
-            await saveFile(file, runId)
+            await saveFile(file, jobId)
 
             // Verify the file is saved at the expected path
-            const filePath = path.resolve(UPLOAD_DIR, runId)
+            const filePath = path.resolve(UPLOAD_DIR, jobId)
             expect(fs.existsSync(filePath)).toBe(true)
 
             // Verify the content of the file

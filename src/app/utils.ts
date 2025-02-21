@@ -13,17 +13,17 @@ export const createUploadDirIfNotExists = () => {
     }
 }
 
-export const saveFile = async (file: Blob, runId: string) => {
+export const saveFile = async (file: Blob, jobId: string) => {
     createUploadDirIfNotExists()
-    log(`Saving file for run ID: ${runId}`)
+    log(`Saving file for job ID: ${jobId}`)
     const buffer = Buffer.from(await file.arrayBuffer())
-    fs.writeFileSync(path.resolve(UPLOAD_DIR, runId), buffer)
+    fs.writeFileSync(path.resolve(UPLOAD_DIR, jobId), buffer)
 }
 
-export const deleteFile = async (runId: string) => {
+export const deleteFile = async (jobId: string) => {
     createUploadDirIfNotExists()
-    log(`Deleting file for run ID: ${runId}`)
-    fs.unlinkSync(path.resolve(UPLOAD_DIR, runId))
+    log(`Deleting file for job ID: ${jobId}`)
+    fs.unlinkSync(path.resolve(UPLOAD_DIR, jobId))
 }
 
 export const generateAuthorizationHeaders = () => {

@@ -2,12 +2,12 @@
 
 import { Alert, LoadingOverlay, Paper, Stack, Title } from '@mantine/core'
 import { DataTable } from 'mantine-datatable'
-import { useRunResults } from '@/app/requests'
+import { useJobResults } from '@/app/requests'
 import { Approve } from '@/components/approve-button'
 import { Results } from '@/components/results'
 
 export default function Home() {
-    const { data: runs = {}, isLoading, isError, error } = useRunResults()
+    const { data: jobs = {}, isLoading, isError, error } = useJobResults()
 
     if (isLoading) {
         return <LoadingOverlay visible={true} />
@@ -17,9 +17,9 @@ export default function Home() {
         return <div>Error: {error.toString()}</div>
     }
 
-    if (Object.entries(runs).length === 0) {
+    if (Object.entries(jobs).length === 0) {
         return (
-            <Alert color="orange" title="Run Results" mb="lg">
+            <Alert color="orange" title="Job Results" mb="lg">
                 No Study result is available at this time.
             </Alert>
         )
@@ -30,7 +30,7 @@ export default function Home() {
             <Stack>
                 <Paper m="xl" shadow="xs" p="xl">
                     <Title order={2} mb="md">
-                        Run Results
+                        Job Results
                     </Title>
 
                     <Stack>
@@ -38,7 +38,7 @@ export default function Home() {
                             idAccessor={'fileName'}
                             withTableBorder={false}
                             withColumnBorders={false}
-                            records={Object.entries(runs).map(([fileName]) => {
+                            records={Object.entries(jobs).map(([fileName]) => {
                                 return {
                                     fileName: fileName,
                                 }
@@ -49,7 +49,7 @@ export default function Home() {
                                     accessor: 'results',
                                     title: '',
                                     render: (item) => (
-                                        <Results fileName={item.fileName} records={runs[item.fileName]} />
+                                        <Results fileName={item.fileName} records={jobs[item.fileName]} />
                                     ),
                                 },
                                 {
