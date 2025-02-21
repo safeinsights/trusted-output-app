@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import path from 'path'
-import { GET } from '@/app/api/runs/route'
+import { GET } from '@/app/api/jobs/route'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
 
-describe('GET /api/runs', () => {
+describe('GET /api/jobs', () => {
     const testFiles = ['1', '2', '3', 'empty']
 
     beforeEach(() => {
@@ -21,14 +21,14 @@ describe('GET /api/runs', () => {
         })
     })
 
-    it('should return a list of run IDs from CSV files', async () => {
+    it('should return a list of job IDs from CSV files', async () => {
         const response = GET()
 
         expect(response.status).toBe(200)
         const json = await response.json()
 
         expect(json).toEqual({
-            runs: [{ runId: '1' }, { runId: '2' }, { runId: '3' }, { runId: 'empty' }],
+            jobs: [{ jobId: '1' }, { jobId: '2' }, { jobId: '3' }, { jobId: 'empty' }],
         })
     })
 
@@ -40,6 +40,6 @@ describe('GET /api/runs', () => {
 
         expect(response.status).toBe(200)
         const json = await response.json()
-        expect(json).toEqual({ runs: [] })
+        expect(json).toEqual({ jobs: [] })
     })
 })

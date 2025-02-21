@@ -8,7 +8,7 @@ import { parse } from 'csv-parse/sync'
 export const revalidate = 0
 
 export function GET() {
-    const runs: Record<string, any[]> = {} // eslint-disable-line
+    const jobs: Record<string, any[]> = {} // eslint-disable-line
     log('Retrieving results from upload directory')
     if (fs.existsSync(UPLOAD_DIR)) {
         const files = fs.readdirSync(UPLOAD_DIR)
@@ -18,12 +18,12 @@ export function GET() {
             log(`Processing file: ${file}`)
             const fileContent = fs.readFileSync(filePath, 'utf-8')
 
-            runs[file] = parse(fileContent, {
+            jobs[file] = parse(fileContent, {
                 columns: true,
                 skip_empty_lines: true,
             })
         }
     }
 
-    return NextResponse.json({ runs: runs })
+    return NextResponse.json({ jobs: jobs })
 }

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
 
-describe('GET /api/run/results', () => {
+describe('GET /api/job/results', () => {
     const mockFileContent = 'header1,header2\nvalue1,value2'
     const mockFileName = 'test.csv'
 
@@ -21,12 +21,12 @@ describe('GET /api/run/results', () => {
         const response = GET()
         const data = await response.json()
         expect(response.status).toBe(200)
-        expect(data.runs).toEqual({
+        expect(data.jobs).toEqual({
             [mockFileName]: [{ header1: 'value1', header2: 'value2' }],
         })
     })
 
-    it('should return empty runs when the directory does not exist', async () => {
+    it('should return empty jobs when the directory does not exist', async () => {
         // Simulate the directory not existing by removing it from mockFs
         mockFs({
             [UPLOAD_DIR]: {},
@@ -37,6 +37,6 @@ describe('GET /api/run/results', () => {
 
         // Verify the response is an empty object
         expect(response.status).toBe(200)
-        expect(data.runs).toEqual({})
+        expect(data.jobs).toEqual({})
     })
 })

@@ -1,23 +1,23 @@
 import { describe, expect, it, vi } from 'vitest'
-import { PUT } from '@/app/api/run/[runId]/route'
+import { PUT } from '@/app/api/job/[jobId]/route'
 import { v4 } from 'uuid'
 import { NextRequest } from 'next/server'
 
-describe('PUT /api/run/:runId', () => {
-    const runId = v4()
+describe('PUT /api/job/:jobId', () => {
+    const jobId = v4()
 
-    it('should return 400 if runId is missing', async () => {
+    it('should return 400 if jobId is missing', async () => {
         const req = new NextRequest('http://localhost', { method: 'PUT' })
-        const params = Promise.resolve({ runId: '' })
+        const params = Promise.resolve({ jobId: '' })
         const res = await PUT(req, { params })
 
         expect(res.status).toBe(400)
         const data = await res.json()
-        expect(data).toEqual({ error: 'Missing runId' })
+        expect(data).toEqual({ error: 'Missing jobId' })
     })
 
     it('should return 400 if JSON data is not of expected shape', async () => {
-        const params = Promise.resolve({ runId: runId })
+        const params = Promise.resolve({ jobId: jobId })
 
         // Empty object
         let req = new NextRequest('http://localhost', { method: 'PUT', body: JSON.stringify({}) })
@@ -52,7 +52,7 @@ describe('PUT /api/run/:runId', () => {
 
     it('should return 400 if status data is not of expected value', async () => {
         const req = new NextRequest('http://localhost', { method: 'PUT', body: JSON.stringify({ status: 'FOO' }) })
-        const params = Promise.resolve({ runId: runId })
+        const params = Promise.resolve({ jobId: jobId })
         const res = await PUT(req, { params })
 
         expect(res.status).toBe(400)
@@ -76,11 +76,11 @@ describe('PUT /api/run/:runId', () => {
             method: 'PUT',
             body: JSON.stringify({ status: 'JOB-RUNNING' }),
         })
-        const params = Promise.resolve({ runId: runId })
+        const params = Promise.resolve({ jobId: jobId })
         const res = await PUT(req, { params })
 
         expect(mockBMAResponse).toHaveBeenCalledOnce()
-        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
+        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/job/${jobId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
             body: JSON.stringify({ status: 'JOB-RUNNING' }),
@@ -104,11 +104,11 @@ describe('PUT /api/run/:runId', () => {
             method: 'PUT',
             body: JSON.stringify({ status: 'JOB-RUNNING', message: 'message' }),
         })
-        const params = Promise.resolve({ runId: runId })
+        const params = Promise.resolve({ jobId: jobId })
         const res = await PUT(req, { params })
 
         expect(mockBMAResponse).toHaveBeenCalledOnce()
-        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
+        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/job/${jobId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
             body: JSON.stringify({ status: 'JOB-RUNNING', message: 'message' }),
@@ -132,11 +132,11 @@ describe('PUT /api/run/:runId', () => {
             method: 'PUT',
             body: JSON.stringify({ status: 'JOB-RUNNING' }),
         })
-        const params = Promise.resolve({ runId: runId })
+        const params = Promise.resolve({ jobId: jobId })
         const res = await PUT(req, { params })
 
         expect(mockBMAResponse).toHaveBeenCalledOnce()
-        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/run/${runId}`, {
+        expect(mockBMAResponse).toHaveBeenCalledWith(`http://bma/api/job/${jobId}`, {
             method: 'PUT',
             headers: { Authorization: 'Bearer tokenvalue' },
             body: JSON.stringify({ status: 'JOB-RUNNING' }),

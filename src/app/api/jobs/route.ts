@@ -6,18 +6,18 @@ import path from 'path'
 // This disables caching for this endpoint
 export const revalidate = 0
 
-interface Run {
-    runId: string
+interface Job {
+    jobId: string
 }
 
 export function GET() {
-    let runs: Run[] = []
-    log(`TOA: Retrieving run ids from filesystem...`)
+    let jobs: Job[] = []
+    log(`TOA: Retrieving job ids from filesystem...`)
     if (fs.existsSync(UPLOAD_DIR)) {
         const files = fs.readdirSync(UPLOAD_DIR)
-        runs = files.map((file) => {
-            return { runId: path.basename(file) }
+        jobs = files.map((file) => {
+            return { jobId: path.basename(file) }
         })
     }
-    return NextResponse.json({ runs })
+    return NextResponse.json({ jobs })
 }

@@ -1,26 +1,26 @@
-import { POST } from '@/app/api/run/[runId]/approve/route'
+import { POST } from '@/app/api/job/[jobId]/approve/route'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
 import { v4 } from 'uuid'
 import { NextRequest } from 'next/server'
 
-describe('POST /api/run/:runId/approve', () => {
+describe('POST /api/job/:jobId/approve', () => {
     const mockFileContent = 'header1,header2\nvalue1,value2'
-    const runId = v4()
+    const jobId = v4()
 
     beforeEach(() => {
         // Mock the file system with the necessary file
         mockFs({
             [UPLOAD_DIR]: {
-                [runId]: mockFileContent,
+                [jobId]: mockFileContent,
             },
         })
     })
 
-    it('should return 400 if runId is missing', async () => {
+    it('should return 400 if jobId is missing', async () => {
         const req = new NextRequest('http://localhost', { method: 'POST' })
-        const params = Promise.resolve({ runId: '' })
+        const params = Promise.resolve({ jobId: '' })
         const res = await POST(req, { params })
 
         // Check status
@@ -30,11 +30,11 @@ describe('POST /api/run/:runId/approve', () => {
     it('should return 400 if the file does not exist', async () => {
         // Simulate the file not existing by removing it from mockFs
         mockFs({
-            [UPLOAD_DIR]: {}, // Empty the directory to simulate no file for 'runId'
+            [UPLOAD_DIR]: {}, // Empty the directory to simulate no file for 'jobId'
         })
 
         const req = new NextRequest('http://localhost', { method: 'POST' })
-        const params = Promise.resolve({ runId: 'non-existent-run' })
+        const params = Promise.resolve({ jobId: 'non-existent-job' })
         const res = await POST(req, { params })
 
         // Check status
@@ -50,7 +50,7 @@ describe('POST /api/run/:runId/approve', () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: false }))
 
         const req = new NextRequest('http://localhost', { method: 'POST' })
-        const params = Promise.resolve({ runId })
+        const params = Promise.resolve({ jobId })
         const res = await POST(req, { params })
 
         // Check status
@@ -66,7 +66,7 @@ describe('POST /api/run/:runId/approve', () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true }))
 
         const req = new NextRequest('http://localhost', { method: 'POST' })
-        const params = Promise.resolve({ runId })
+        const params = Promise.resolve({ jobId })
         const res = await POST(req, { params })
 
         // Check status
