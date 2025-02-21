@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAuthorizationHeaders } from '@/app/utils'
 
-export enum AllowedStatusUpdates {
+enum AllowedStatusUpdates {
     JOB_PROVISIONING = 'JOB-PROVISIONING',
     JOB_RUNNING = 'JOB-RUNNING',
     JOB_ERRORED = 'JOB-ERRORED',
