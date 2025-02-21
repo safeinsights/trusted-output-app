@@ -2,16 +2,16 @@
 
 ## This application is responsible for:
 
-- Receiving a CSV file from the research container with the results of the code run
+- Receiving a CSV file from the research container with the results of the code job
 - Saving that CSV to memory (TBD) for the lifespan of this container
-- Allowing members(TM) to log in and approve the results of the code run (AKA the CSV files)
+- Allowing members(TM) to log in and approve the results of the code job (AKA the CSV files)
 - Once the members approve the results, this application will post the CSV file to the management app (Endpoint TBD)
 
 ## Hitting the upload endpoint:
 
 ```
-curl -X POST http://localhost:3002/api/run/:runId/upload -F "file=@test-data/industry.csv" -u admin:password
-curl -X POST http://localhost:3002/api/run/:runId/upload -F "file=@test-data/currency.csv" -u admin:password
+curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/industry.csv" -u admin:password
+curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/currency.csv" -u admin:password
 ```
 
 ## Generate Public and Private keys
@@ -38,6 +38,6 @@ echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 
 1. Create a study on the management app
 1. Get the UUID of the study here: http://localhost:4000/member/openstax/studies/review
-1. Alternatively, you can run `docker compose exec postgres psql -U mgmnt mgmnt_dev -c 'select id,status from study_run;'`
-1. take that uuid and upload it manually like so: `curl -X POST http://localhost:3002/api/run/{Run_UUID_HERE}/upload -F "file=@test-data/industry.csv" -u admin:password`
+1. Alternatively, you can run `docker compose exec postgres psql -U mgmnt mgmnt_dev -c 'select id,created_at from study_job;'`
+1. take that uuid and upload it manually like so: `curl -X POST http://localhost:3002/api/job/{Job_UUID_HERE}/upload -F "file=@test-data/industry.csv" -u admin:password`
 1. Approve the study with the UUID you just uploaded
