@@ -2,16 +2,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@/tests/test-utils'
 import Home from './page'
 import * as requests from './requests'
-import { useRunResults } from './requests'
+import { useJobResults } from './requests'
 
 vi.mock('@/app/requests', () => ({
-    useRunResults: vi.fn(),
-    useApproveRun: vi.fn(),
+    useJobResults: vi.fn(),
+    useApproveJob: vi.fn(),
 }))
 
 describe('Home', () => {
     it('shows the loading overlay when loading', () => {
-        vi.mocked(useRunResults).mockReturnValue({
+        vi.mocked(useJobResults).mockReturnValue({
             isLoading: true,
             isError: false,
             data: undefined,
@@ -25,7 +25,7 @@ describe('Home', () => {
     })
 
     it('shows error state', () => {
-        vi.mocked(requests.useRunResults).mockReturnValue({
+        vi.mocked(requests.useJobResults).mockReturnValue({
             data: undefined,
             isLoading: false,
             isError: true,
@@ -37,7 +37,7 @@ describe('Home', () => {
     })
 
     it('shows empty state', () => {
-        vi.mocked(requests.useRunResults).mockReturnValue({
+        vi.mocked(requests.useJobResults).mockReturnValue({
             data: {},
             isLoading: false,
             isError: false,
@@ -53,20 +53,20 @@ describe('Home', () => {
             'test.csv': [{ col1: 'value1', col2: 'value2' }],
         }
 
-        vi.mocked(requests.useRunResults).mockReturnValue({
+        vi.mocked(requests.useJobResults).mockReturnValue({
             data: mockData,
             isLoading: false,
             isError: false,
             error: null,
         } as never)
 
-        vi.mocked(requests.useApproveRun).mockReturnValue({
+        vi.mocked(requests.useApproveJob).mockReturnValue({
             mutate: vi.fn(),
         } as never)
 
         render(<Home />)
 
-        expect(screen.getByText('Run Results')).toBeDefined()
+        expect(screen.getByText('Job Results')).toBeDefined()
         expect(screen.getByText('test.csv')).toBeDefined()
         expect(screen.getByText('View Results')).toBeDefined()
         expect(screen.getByText('Approve')).toBeDefined()

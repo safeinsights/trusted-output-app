@@ -5,27 +5,27 @@ export interface CSVRecord {
     [key: string]: string
 }
 
-export interface RunData {
+export interface JobData {
     [fileName: string]: CSVRecord[]
 }
 
-export const useRunResults = () => {
+export const useJobResults = () => {
     return useQuery({
-        queryKey: ['run-results'],
-        queryFn: async (): Promise<RunData> => {
-            const response = await fetch('/api/run/results')
+        queryKey: ['job-results'],
+        queryFn: async (): Promise<JobData> => {
+            const response = await fetch('/api/job/results')
             const data = await response.json()
-            return data.runs as RunData
+            return data.jobs as JobData
         },
     })
 }
 
-export const useApproveRun = () => {
+export const useApproveJob = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: async (fileName: string) => {
-            const response = await fetch(`/api/run/${fileName}/approve`, {
+            const response = await fetch(`/api/job/${fileName}/approve`, {
                 method: 'POST',
             })
             if (!response.ok) {
@@ -34,11 +34,11 @@ export const useApproveRun = () => {
             }
         },
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['run-results'] })
+            await queryClient.invalidateQueries({ queryKey: ['job-results'] })
             notifications.show({
                 color: 'green',
-                title: 'Study Run Approved',
-                message: 'The run has been approved.',
+                title: 'Study Job Approved',
+                message: 'The job has been approved.',
                 autoClose: 5_000,
                 position: 'top-right',
             })
@@ -48,8 +48,8 @@ export const useApproveRun = () => {
 
             notifications.show({
                 color: 'red',
-                title: 'Study Run Approval Failed',
-                message: `An error occurred while approving the study run. ${error.message}. Please retry later.`,
+                title: 'Study Job Approval Failed',
+                message: `An error occurred while approving the study job. ${error.message}. Please retry later.`,
                 autoClose: 5_000,
                 position: 'top-right',
             })

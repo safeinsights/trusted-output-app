@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, waitFor } from '@/tests/test-utils'
-import { useApproveRun, useRunResults } from './requests'
+import { useApproveJob, useJobResults } from './requests'
 import { notifications } from '@mantine/notifications'
 
 vi.mock('@mantine/notifications', () => ({
@@ -9,14 +9,14 @@ vi.mock('@mantine/notifications', () => ({
     },
 }))
 
-describe('useRunResults', () => {
+describe('useJobResults', () => {
     beforeEach(() => {
         vi.resetAllMocks()
     })
 
-    it('fetches run results successfully', async () => {
+    it('fetches job results successfully', async () => {
         const mockData = {
-            runs: {
+            jobs: {
                 'file1.csv': [{ col1: 'value1' }],
                 'file2.csv': [{ col1: 'value2' }],
             },
@@ -26,20 +26,20 @@ describe('useRunResults', () => {
             json: () => Promise.resolve(mockData),
         })
 
-        const { result } = renderHook(() => useRunResults())
+        const { result } = renderHook(() => useJobResults())
 
         await waitFor(() => {
             expect(result.current.isSuccess).toBe(true)
         })
 
-        expect(result.current.data).toEqual(mockData.runs)
-        expect(fetch).toHaveBeenCalledWith('/api/run/results')
+        expect(result.current.data).toEqual(mockData.jobs)
+        expect(fetch).toHaveBeenCalledWith('/api/job/results')
     })
 
     it('handles fetch error', async () => {
         global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
-        const { result } = renderHook(() => useRunResults())
+        const { result } = renderHook(() => useJobResults())
 
         await waitFor(() => {
             expect(result.current.isError).toBe(true)
@@ -49,32 +49,32 @@ describe('useRunResults', () => {
     })
 })
 
-describe('useApproveRun', () => {
+describe('useApproveJob', () => {
     beforeEach(() => {
         vi.resetAllMocks()
     })
 
-    it('approves run successfully', async () => {
+    it('approves job successfully', async () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             json: () => Promise.resolve({}),
         })
 
-        const { result } = renderHook(() => useApproveRun())
+        const { result } = renderHook(() => useApproveJob())
 
         result.current.mutate('test.csv')
 
         await waitFor(() => {
             expect(notifications.show).toHaveBeenCalledWith({
                 color: 'green',
-                title: 'Study Run Approved',
-                message: 'The run has been approved.',
+                title: 'Study Job Approved',
+                message: 'The job has been approved.',
                 autoClose: 5_000,
                 position: 'top-right',
             })
         })
 
-        expect(fetch).toHaveBeenCalledWith('/api/run/test.csv/approve', {
+        expect(fetch).toHaveBeenCalledWith('/api/job/test.csv/approve', {
             method: 'POST',
         })
     })
@@ -86,15 +86,15 @@ describe('useApproveRun', () => {
             json: () => Promise.resolve({ error: errorMessage }),
         })
 
-        const { result } = renderHook(() => useApproveRun())
+        const { result } = renderHook(() => useApproveJob())
 
         result.current.mutate('test.csv')
 
         await waitFor(() => {
             expect(notifications.show).toHaveBeenCalledWith({
                 color: 'red',
-                title: 'Study Run Approval Failed',
-                message: `An error occurred while approving the study run. ${errorMessage}. Please retry later.`,
+                title: 'Study Job Approval Failed',
+                message: `An error occurred while approving the study job. ${errorMessage}. Please retry later.`,
                 autoClose: 5_000,
                 position: 'top-right',
             })
