@@ -38,7 +38,7 @@ export const generateAuthorizationHeaders = () => {
                 iss: memberId,
             },
             privateKey,
-            { algorithm: 'RS256' },
+            { algorithm: 'RS256', expiresIn: 60 },
         )
     }
     return {
