@@ -82,7 +82,7 @@ describe('Utils', () => {
             expect(headers).toEqual({
                 Authorization: 'Bearer mock-jwt-token',
             })
-            expect(tokenSpy).toHaveBeenCalledWith({ iss: memberId }, privateKey, { algorithm: 'RS256' })
+            expect(tokenSpy).toHaveBeenCalledWith({ iss: memberId }, privateKey, { algorithm: 'RS256', expiresIn: 60 })
         })
 
         it('should return an empty Authorization header if privateKey or memberId is missing', () => {
