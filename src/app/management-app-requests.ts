@@ -1,7 +1,9 @@
 import { generateAuthorizationHeaders, log } from './utils'
 
 export type ManagementAppPublicKey = {
-    jobId: string, publicKey: string, fingerprint: string
+    jobId: string
+    publicKey: string
+    fingerprint: string
 }
 
 export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAppPublicKey[] } | undefined> => {

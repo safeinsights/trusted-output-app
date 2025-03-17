@@ -18,7 +18,7 @@ beforeEach(() => {
 describe('POST /api/job/[jobId]/upload if no public keys', () => {
     beforeEach(() => {
         vi.mocked(mgmt.getPublicKeys).mockResolvedValue({
-            keys: []
+            keys: [],
         })
     })
 
@@ -166,8 +166,9 @@ v/RAuzxQGTVe6QMetgEkpRr6Cnlo6fSIdF77D2LEvDH++Nut4MglIyI2/uJ2yAzJ
 ePfWw2aZVF80tm3K5n3NHnn9xHfymeU9XBWFVpf7omt1QbtUv0MDv0WyP168qVnh
 8q/rTZCb0UylRhIrVHcVoDD7ELG+lLjz87CHFxDSrcVxaCnUSDP6kmK19YqpuzET
 daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`,
-                    jobId: 'jobId' }
-            ]
+                    jobId: 'jobId',
+                },
+            ],
         })
 
         // Mock data to send in
@@ -188,11 +189,7 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`,
 
         const response = await POST(req, { params })
 
-        expect(mgmt.uploadResults).toHaveBeenCalledWith(
-            mockJobId,
-            expect.any(Blob),
-            'application/zip'
-        )
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip')
         expect(response.status).toBe(200)
     })
 

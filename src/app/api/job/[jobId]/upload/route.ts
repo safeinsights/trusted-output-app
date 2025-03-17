@@ -9,7 +9,11 @@ function isFile(obj: FormDataEntryValue): obj is File {
     return obj instanceof File
 }
 
-const encryptResults = async (jobId: string, jobResults: ArrayBuffer, publicKeys: ManagementAppPublicKey[]): Promise<Blob> => {
+const encryptResults = async (
+    jobId: string,
+    jobResults: ArrayBuffer,
+    publicKeys: ManagementAppPublicKey[],
+): Promise<Blob> => {
     const writerParams = publicKeys.map((key) => {
         return { fingerprint: key.fingerprint, publicKey: key.publicKey }
     })
@@ -20,7 +24,6 @@ const encryptResults = async (jobId: string, jobResults: ArrayBuffer, publicKeys
     const encryptedResults: Blob = await writer.generate()
     return encryptedResults
 }
-
 
 export const POST = async (req: NextRequest, { params }: { params: Promise<{ jobId: string }> }) => {
     const formData = await req.formData()
@@ -53,7 +56,7 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
         }
     } else {
         log('Encrypting results with public keys ...')
-        const file = await body.file as Blob
+        const file = (await body.file) as Blob
         const resultsBuffer = await file.arrayBuffer()
         const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
         const response = await uploadResults(jobId, encryptedResults, 'application/zip')
