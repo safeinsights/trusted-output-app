@@ -1,12 +1,26 @@
-import { isValidUUID, log, saveFile, UPLOAD_DIR, ensureValue, generateAuthorizationHeaders } from '@/app/utils'
+import { isValidUUID, log, saveFile, UPLOAD_DIR, ensureValue } from '@/app/utils'
 import fs from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
-import { encryptResults, getPublicKeys } from '@/encrypt'
+import { getPublicKeys, ManagementAppPublicKey, uploadResults } from '@/app/management-app-requests'
+import { ResultsWriter } from 'si-encryption/job-results/writer'
 
 function isFile(obj: FormDataEntryValue): obj is File {
     return obj instanceof File
 }
+
+const encryptResults = async (jobId: string, jobResults: ArrayBuffer, publicKeys: ManagementAppPublicKey[]): Promise<Blob> => {
+    const writerParams = publicKeys.map((key) => {
+        return { fingerprint: key.fingerprint, publicKey: key.publicKey }
+    })
+    const writer = new ResultsWriter(writerParams)
+
+    await writer.addFile(jobId, jobResults)
+
+    const encryptedResults: Blob = await writer.generate()
+    return encryptedResults
+}
+
 
 export const POST = async (req: NextRequest, { params }: { params: Promise<{ jobId: string }> }) => {
     const formData = await req.formData()
@@ -24,7 +38,6 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
         errorMessage = 'Form data includes unexpected data keys'
     }
 
-    log("Getting public keys ...")
     let publicKeys = await getPublicKeys(jobId)
     publicKeys = ensureValue(publicKeys)
     if (publicKeys.keys.length === 0) {
@@ -40,19 +53,10 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
         }
     } else {
         log('Encrypting results with public keys ...')
-        const resultsBuffer = Buffer.from(await body.file.arrayBuffer())
+        const file = await body.file as Blob
+        const resultsBuffer = await file.arrayBuffer()
         const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
-        const formData = new FormData()
-        formData.append('file', new File([encryptedResults], jobId, { type: 'application/zip' }))
-        const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}/results`
-        log(`BMA: Uploading encrypted results ${endpoint}`)
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                ...generateAuthorizationHeaders(),
-            },
-        })
+        const response = await uploadResults(jobId, encryptedResults, 'application/zip')
         if (!response.ok) {
             errorMessage = `Failed to post encrypted results: ${response.status}`
         } else {
