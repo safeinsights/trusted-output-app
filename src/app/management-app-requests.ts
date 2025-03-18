@@ -23,12 +23,8 @@ export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAp
         throw new Error(`Failed to fetch public keys for job ID: ${jobId}`)
     }
 
-    try {
-        const body = await response.json()
-        return body
-    } catch (e) {
-        console.error('Failed to parse response body', e)
-    }
+    const body = await response.json()
+    return body
 }
 
 export const uploadResults = async (jobId: string, results: Buffer | Blob, type: 'text/csv' | 'application/zip') => {
