@@ -57,3 +57,10 @@ export const log = (message: string, level: 'info' | 'error' = 'info', error: Er
         console[level](`[${level.toUpperCase()}] - ${message}`)
     }
 }
+
+export const ensureValue = <T>(value: T | undefined | null, message?: string): T => {
+    if (value === undefined || value === null) {
+        throw new Error(message || `Value is ${value}`)
+    }
+    return value
+}
