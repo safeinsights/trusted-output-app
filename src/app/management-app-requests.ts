@@ -1,8 +1,9 @@
 import { generateAuthorizationHeaders, log } from './utils'
+import { type SerializedBuffer } from 'si-encryption/util'
 
 export type ManagementAppPublicKey = {
     jobId: string
-    publicKey: string
+    publicKey: SerializedBuffer
     fingerprint: string
 }
 

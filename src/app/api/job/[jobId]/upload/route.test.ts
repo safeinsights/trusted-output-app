@@ -6,6 +6,7 @@ import fs from 'fs'
 import { UPLOAD_DIR } from '@/app/utils'
 import mockFs from 'mock-fs'
 import { v4 as uuidv4 } from 'uuid'
+import { pemToJSONBuffer } from 'si-encryption/util'
 
 import * as mgmt from '@/app/management-app-requests'
 
@@ -153,8 +154,9 @@ describe('POST /api/job/[jobId]/upload if public keys', () => {
         vi.mocked(mgmt.getPublicKeys).mockResolvedValue({
             keys: [
                 {
+                    jobId: 'jobId',
                     fingerprint: '77c2d18672112a2ecc8428302822a28ee7356c668423dc5a828ed53ccc87150d',
-                    publicKey: `MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArd5ojUorKV9l1i/canpo
+                    publicKey: pemToJSONBuffer(`MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArd5ojUorKV9l1i/canpo
 4JEKlENlX2VDB5yAkYevUea+hSpVLFnIBbd5n/Qejqs6uUhtxl1LmqPBuB8dMObL
 waqLNWyD0MlHIRlzlLGcJPe7i6Mus2aeeFSGF6bZ/OQ36kbdeJCzM/Q+y3qXfY1j
 rvFChbOTBDV0prpDZNNR6EY29V7YGqxIX9hsU8GrnKC2U1olc35lCVxCyVGFep8j
@@ -165,8 +167,7 @@ junaozRtmGA0F00pdhZDEr+md0MHEaECvmeSrG8iXiHiEuihCfuAV19ld/O0RVDO
 v/RAuzxQGTVe6QMetgEkpRr6Cnlo6fSIdF77D2LEvDH++Nut4MglIyI2/uJ2yAzJ
 ePfWw2aZVF80tm3K5n3NHnn9xHfymeU9XBWFVpf7omt1QbtUv0MDv0WyP168qVnh
 8q/rTZCb0UylRhIrVHcVoDD7ELG+lLjz87CHFxDSrcVxaCnUSDP6kmK19YqpuzET
-daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`,
-                    jobId: 'jobId',
+daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
                 },
             ],
         })

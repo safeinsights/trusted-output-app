@@ -3,6 +3,7 @@ import fs from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import { getPublicKeys, ManagementAppPublicKey, uploadResults } from '@/app/management-app-requests'
+import type { PublicKey } from 'si-encryption/job-results/types'
 import { ResultsWriter } from 'si-encryption/job-results/writer'
 
 function isFile(obj: FormDataEntryValue): obj is File {
@@ -15,7 +16,7 @@ const encryptResults = async (
     publicKeys: ManagementAppPublicKey[],
 ): Promise<Blob> => {
     const writerParams = publicKeys.map((key) => {
-        return { fingerprint: key.fingerprint, publicKey: key.publicKey }
+        return { fingerprint: key.fingerprint, publicKey: new Uint8Array(key.publicKey.data).buffer } as PublicKey
     })
     const writer = new ResultsWriter(writerParams)
 
@@ -42,6 +43,7 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
     }
 
     let publicKeys = await getPublicKeys(jobId)
+
     publicKeys = ensureValue(publicKeys)
     if (publicKeys.keys.length === 0) {
         log('No public keys found for job ID: ' + jobId)
