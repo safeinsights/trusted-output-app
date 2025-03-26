@@ -53,7 +53,7 @@ export const isValidUUID = (value: string): boolean => {
 export const log = (message: string, level: 'info' | 'error' = 'info', error: Error | undefined = undefined) => {
     if (error) {
         console.error(`[${level.toUpperCase()}] - ${message} - ${error.message}`)
-    } else if (process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true') {
+    } else {
         console[level](`[${level.toUpperCase()}] - ${message}`)
     }
 }
