@@ -32,6 +32,8 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
     const jobId = (await params).jobId
     let errorMessage = ''
 
+    log(`Received results upload request for jobId ${jobId}`)
+
     if (!jobId) {
         errorMessage = 'Missing jobId'
     } else if (!isValidUUID(jobId)) {
