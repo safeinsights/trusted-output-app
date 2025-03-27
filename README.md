@@ -14,7 +14,7 @@ curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/ind
 curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/currency.csv" -u admin:password
 ```
 
-## Generate Public and Private keys
+## Generate Member Enclave Management Key pair
 
 To generate a public/private key pair you can run:
 
