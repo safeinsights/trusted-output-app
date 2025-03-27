@@ -8,7 +8,7 @@
 
 ### Option 1: Encrypt results and send to Management App
 
-This happens if there are Member Reviewer public keys (from the Member Reviewer Keypair) in the Management App's database.
+This happens if there are Member Reviewer [public keys](https://github.com/safeinsights/knowledge-base/blob/main/SafeInsights-Inter%E2%80%90App-Communication-API.md#get-apijobjobidkeys) (from the Member Reviewer Keypair) in the Management App's database.
 
 - This app encrypts the results in a zip using the (encryption)[https://github.com/safeinsights/encryption] library and the Member Reviewers' public keys
 - Then, it sends the encrypted results to the Management App at `/api/job/<jobId>/results`
