@@ -10,7 +10,7 @@
 
 This happens if there are Member Reviewer public keys (from the Member Reviewer Keypair) in the Management App's database.
 
-- This app encrypts the results in a zip using the (encryption)[https://github.com/safeinsights/encryption] library and the member-reviewers' public keys
+- This app encrypts the results in a zip using the (encryption)[https://github.com/safeinsights/encryption] library and the Member Reviewers' public keys
 - Then, it sends the encrypted results to the Management App at `/api/job/<jobId>/results`
 
 ### Option 2: Review results in TOA and send approved to Management App
