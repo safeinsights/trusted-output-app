@@ -32,11 +32,13 @@ Set the `HTTP_BASIC_AUTH` variable in `.env`. Example values `username:password`
 1. Get the UUID of the study here: http://localhost:4000/member/openstax/studies/review
 1. Alternatively, you can run `docker compose exec postgres psql -U mgmnt mgmnt_dev -c 'select id,created_at from study_job;'`
 1. Take that uuid and upload it manually like so:
+
     ```bash
     curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/industry.csv" -u <HTTP_BASIC_AUTH>
 
     curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/currency.csv" -u <HTTP_BASIC_AUTH>
     ```
+
 1. Approve the study with the UUID you just uploaded
 
 ### Management App Authentication with Enclave Keypair
