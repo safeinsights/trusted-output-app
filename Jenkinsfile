@@ -35,18 +35,38 @@ pipeline {
                 '''
             }
         }
-
-        stage('Upload to Harbor') {
-            environment {
-                HARBOR_TOKEN = credentials('harbor-token')
-            }
+        stage('Upload to AWS ECR') {
             steps {
                 sh '''
-                    docker login https://harbor.safeinsights.org/ -u 'robot$jenkins' -p "${HARBOR_TOKEN_PSW}"
-                    docker build -t harbor.safeinsights.org/safeinsights-test/trusted-output-app:"${GIT_COMMIT}" .
-                    docker push harbor.safeinsights.org/safeinsights-test/trusted-output-app:"${GIT_COMMIT}"
+                    read AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<< \$(
+                    aws sts assume-role \
+                        --role-arn arn:aws:iam::337909745635:role/SafeInsights-DevDeploy \
+                        --role-session-name Session \
+                        --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
+                        --output text
+                    )
+                    export AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY
+                    export AWS_SESSION_TOKEN
+                    aws sts get-caller-identity
+
+                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 337909745635.dkr.ecr.us-east-1.amazonaws.com
+                    docker build -t 337909745635.dkr.ecr.us-east-1.amazonaws.com/trusted-output-app:"${GIT_COMMIT}" .
+                    docker push 337909745635.dkr.ecr.us-east-1.amazonaws.com/trusted-output-app:"${GIT_COMMIT}"
                 '''
             }
         }
+        // stage('Upload to Harbor') {
+        //     environment {
+        //         HARBOR_TOKEN = credentials('harbor-token')
+        //     }
+        //     steps {
+        //         sh '''
+        //             docker login https://harbor.safeinsights.org/ -u 'robot$jenkins' -p "${HARBOR_TOKEN_PSW}"
+        //             docker build -t harbor.safeinsights.org/safeinsights-test/trusted-output-app:"${GIT_COMMIT}" .
+        //             docker push harbor.safeinsights.org/safeinsights-test/trusted-output-app:"${GIT_COMMIT}"
+        //         '''
+        //     }
+        // }
     }
 }
