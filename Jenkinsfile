@@ -30,7 +30,7 @@ pipeline {
                     docker run \
                     -e SONAR_HOST_URL="https://sonarqube.sandbox.safeinsights.org/" \
                     -e SONAR_TOKEN="${SONARQUBE_TOKEN}" \
-                    - e SONAR_SCANNER_OPTS="-Dsonar.branch.name=${BRANCH_NAME}" \
+                    -e SONAR_SCANNER_OPTS="-Dsonar.branch.name=${BRANCH_NAME}" \
                     -v "$(pwd):/usr/src" \
                     sonarsource/sonar-scanner-cli
                 '''
