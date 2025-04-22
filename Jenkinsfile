@@ -17,7 +17,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    npm test:unit
+                    npm run test:unit
                 '''
             }
         }
