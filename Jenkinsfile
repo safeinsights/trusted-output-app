@@ -24,17 +24,10 @@ pipeline {
             }
         }
         stage('SonarQube') {
-            environment {
-                SONARQUBE_TOKEN = credentials('sonarqube_token')
-            }
             steps {
-                sh '''
-                    docker run \
-                    -e SONAR_HOST_URL="https://sonarqube.sandbox.safeinsights.org/" \
-                    -e SONAR_TOKEN="${SONARQUBE_TOKEN}" \
-                    -v "$(pwd):/usr/src" \
-                    sonarsource/sonar-scanner-cli
-                '''
+                script {
+                    sonarqube.scan()
+                }
             }
         }
         stage('Upload to AWS ECR') {
