@@ -33,11 +33,9 @@ pipeline {
         stage('Upload to AWS ECR') {
             steps {
                 script {
-                    aws.assumeRole()
+                    aws.assumeRole("arn:aws:iam::337909745635:role/SafeInsights-DevDeploy")
                 }
                 sh '''
-                    aws sts get-caller-identity
-
                     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 337909745635.dkr.ecr.us-east-1.amazonaws.com
                     docker build -t 337909745635.dkr.ecr.us-east-1.amazonaws.com/trusted-output-app:"${GIT_COMMIT}" .
                     docker push 337909745635.dkr.ecr.us-east-1.amazonaws.com/trusted-output-app:"${GIT_COMMIT}"
