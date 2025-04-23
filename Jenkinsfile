@@ -43,9 +43,6 @@ pipeline {
                     aws.assumeRole()
                 }
                 sh '''
-                    export AWS_ACCESS_KEY_ID="${env.AWS_ACCESS_KEY_ID}"
-                    export AWS_SECRET_ACCESS_KEY="${env.AWS_SECRET_ACCESS_KEY}"
-                    export AWS_SESSION_TOKEN="${env.AWS_SESSION_TOKEN}"
                     aws sts get-caller-identity
 
                     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 337909745635.dkr.ecr.us-east-1.amazonaws.com
