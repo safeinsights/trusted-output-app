@@ -40,7 +40,7 @@ pipeline {
         stage('Upload to AWS ECR') {
             steps {
                 script {
-                    aws.assumeRole(roleArn)
+                    aws.assumeRole()
                 }
                 sh '''
                     export AWS_ACCESS_KEY_ID="${env.AWS_ACCESS_KEY_ID}"
