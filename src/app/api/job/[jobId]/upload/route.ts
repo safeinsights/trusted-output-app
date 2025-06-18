@@ -60,8 +60,8 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
         }
     } else {
         log('Encrypting results with public keys ...')
-        const file = (await body.file) as Blob
-        const resultsBuffer = await file.arrayBuffer()
+        const data: Blob = body.file ? ((await body.file) as Blob) : new Blob([body.logs])
+        const resultsBuffer = await data.arrayBuffer()
         const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
         const response = await uploadResults(jobId, encryptedResults, 'application/zip')
         if (!response.ok) {
