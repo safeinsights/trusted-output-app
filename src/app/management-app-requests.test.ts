@@ -41,7 +41,7 @@ describe('uploadResults', () => {
             ok: true,
         })
 
-        const res = await uploadResults('123', new Blob(), 'application/zip')
+        const res = await uploadResults('123', new Blob(), 'application/zip', 'result')
         expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/results', {
             method: 'POST',
             body: expect.any(FormData),

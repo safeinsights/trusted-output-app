@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (fs.existsSync(filePath)) {
         const fileBuffer = await fs.promises.readFile(filePath)
 
-        const response = await uploadResults(jobId, fileBuffer, 'text/csv')
+        const response = await uploadResults(jobId, fileBuffer, 'text/csv', 'result')
 
         if (!response.ok) {
             log(`BMA: Unable to post file for job ID ${jobId}`, 'error')

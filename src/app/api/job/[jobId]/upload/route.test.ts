@@ -190,7 +190,7 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
 
         const response = await POST(req, { params })
 
-        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip')
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
         expect(response.status).toBe(200)
     })
 
