@@ -28,7 +28,12 @@ export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAp
     return body
 }
 
-export const uploadResults = async (jobId: string, results: Buffer | Blob, type: 'text/csv' | 'application/zip', fileType: 'result' | 'log') => {
+export const uploadResults = async (
+    jobId: string,
+    results: Buffer | Blob,
+    type: 'text/csv' | 'application/zip',
+    fileType: 'result' | 'log',
+) => {
     const formData = new FormData()
     formData.append(fileType, new File([results], jobId, { type: type }))
 
