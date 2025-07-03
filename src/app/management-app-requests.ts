@@ -28,9 +28,14 @@ export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAp
     return body
 }
 
-export const uploadResults = async (jobId: string, results: Buffer | Blob, type: 'text/csv' | 'application/zip') => {
+export const uploadResults = async (
+    jobId: string,
+    results: Buffer | Blob,
+    type: 'text/csv' | 'application/zip',
+    fileType: 'result' | 'log',
+) => {
     const formData = new FormData()
-    formData.append('file', new File([results], jobId, { type: type }))
+    formData.append(fileType, new File([results], jobId, { type: type }))
 
     const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}/results`
     log(`BMA: Uploading results ${endpoint}`)
