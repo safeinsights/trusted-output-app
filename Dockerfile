@@ -3,8 +3,15 @@ FROM node:22-alpine AS base
 # Alpine doesn't have curl, so add it
 RUN apk --no-cache add curl
 
+ARG USER=si-user
+ENV HOME /home/$USER
+RUN adduser -D $USER \
+        && mkdir -p /etc/sudoers.d \
+        && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
+        && chmod 0440 /etc/sudoers.d/$USER
+
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR $HOME/app
 
 # Copy the package.json and lock file to install dependencies
 COPY package.json package-lock.json panda.config.ts ./
