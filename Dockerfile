@@ -11,6 +11,7 @@ RUN adduser -D $USER \
         && chmod 0440 /etc/sudoers.d/$USER
 
 # Set the working directory inside the container
+USER $USER
 WORKDIR $HOME/app
 
 # Copy the package.json and lock file to install dependencies
