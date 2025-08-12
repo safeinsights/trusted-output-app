@@ -6,7 +6,18 @@ import { useJobResults } from '@/app/requests'
 import { Approve } from '@/components/approve-button'
 import { Results } from '@/components/results'
 
-export default function Home() {
+const isLambdaDeployment = process.env.NEXT_PUBLIC_LAMBDA_DEPLOYMENT === 'true'
+
+function LambdaModePage() {
+    return (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+            <h1>SafeInsights - Trusted Output Application</h1>
+            <p>API-only mode. UI is disabled in Lambda deployment.</p>
+        </div>
+    )
+}
+
+function UIModePage() {
     const { data: jobs = {}, isLoading, isError, error } = useJobResults()
 
     if (isLoading) {
@@ -64,4 +75,8 @@ export default function Home() {
             </Stack>
         </Stack>
     )
+}
+
+export default function Home() {
+    return isLambdaDeployment ? <LambdaModePage /> : <UIModePage />
 }

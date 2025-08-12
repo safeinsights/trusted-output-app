@@ -23,6 +23,7 @@ node_modules/
 .next/
 coverage/
 playwright-report/
+dist/
 
 # Test results
 test-results/

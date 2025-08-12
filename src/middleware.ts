@@ -31,6 +31,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
 }
 
+// Middleware configuration - must be static
 export const config = {
-    matcher: '/((?!favicon.ico|api/health).*)',
+    matcher: [
+        // API routes (always apply)
+        '/api/((?!health).*)',
+        // UI routes (will be ignored in Lambda due to conditional logic in layout)
+        '/((?!favicon.ico|api/health|_next/static|_next/image).*)',
+    ],
 }

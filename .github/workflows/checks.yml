@@ -36,8 +36,20 @@ jobs:
                   CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
                   E2E_CLERK_USER_USERNAME: ${{ secrets.E2E_CLERK_USER_USERNAME }}
                   E2E_CLERK_USER_PASSWORD: ${{ secrets.E2E_CLERK_USER_PASSWORD }}
-            - name: Test build
+            - name: Test container build
               run: npm run build
+            - name: Test Lambda build (Next.js hybrid)
+              run: npm run build:lambda
+            - name: Test Lambda build (esbuild functions)
+              run: npm run lambda:build
+            - name: Verify Lambda functions exist
+              run: |
+                  test -d dist/lambda
+                  test -f dist/lambda/health.js
+                  test -f dist/lambda/job-upload.js
+                  test -f dist/lambda/job-approve.js
+                  test -f dist/lambda/job-status.js
+                  test -f dist/lambda/jobs-list.js
             - uses: actions/upload-artifact@v4
               if: failure()
               with:

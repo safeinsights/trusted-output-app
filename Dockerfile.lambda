@@ -1,0 +1,36 @@
+# Use AWS Lambda Node.js runtime
+FROM public.ecr.aws/lambda/nodejs:20
+
+# Set environment variables for Lambda deployment
+ENV LAMBDA_DEPLOYMENT=true
+ENV NEXT_PUBLIC_LAMBDA_DEPLOYMENT=true
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production --ignore-scripts
+
+# Install Next.js dependencies for build
+COPY package*.json ./
+RUN npm install next react react-dom
+
+# Copy source code
+COPY . .
+
+# Generate Panda CSS
+RUN npm run prepare
+
+# Build the Next.js application in standalone mode
+RUN npm run build:lambda
+
+# Copy the standalone build and handler
+RUN cp -r .next/standalone/* ./ && \
+    cp serverless-handler.js ./
+
+# Copy static assets and public files
+RUN cp -r .next/static ./.next/ && \
+    cp -r public ./
+
+# Set the Lambda handler
+CMD ["serverless-handler.handler"]

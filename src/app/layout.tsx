@@ -12,11 +12,25 @@ export const metadata: Metadata = {
     description: 'SafeInsights - Trusted Output Application',
 }
 
+const isLambdaDeployment = process.env.LAMBDA_DEPLOYMENT === 'true'
+
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
+    if (isLambdaDeployment) {
+        return (
+            <html lang="en">
+                <head>
+                    <title>SafeInsights - TOA</title>
+                    <meta name="description" content="SafeInsights - Trusted Output Application" />
+                </head>
+                <body>{children}</body>
+            </html>
+        )
+    }
+
     return (
         <html lang="en">
             <head>
