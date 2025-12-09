@@ -74,7 +74,7 @@ describe('Utils', () => {
             const memberId = 'member-id'
             process.env.MANAGEMENT_APP_PRIVATE_KEY = privateKey
             process.env.MANAGEMENT_APP_MEMBER_ID = memberId
-            // @ts-expect-error seems to be a weird typescript error that isn't real
+            // @ts-expect-error seems to be a unique TypeScript error that isn't real
             const tokenSpy = vi.spyOn(jwt, 'sign').mockReturnValueOnce('mock-jwt-token')
 
             const headers = generateAuthorizationHeaders()

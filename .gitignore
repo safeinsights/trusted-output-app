@@ -22,7 +22,6 @@ node_modules/
 # Build outputs
 .next/
 coverage/
-playwright-report/
 
 # Test results
 test-results/
