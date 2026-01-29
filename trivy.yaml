@@ -2,11 +2,21 @@ format: json
 exit-code: 0
 debug: false
 severity:
-    - CRITICAL
+    - MEDIUM
     - HIGH
+    - CRITICAL
 scan:
     scanners:
         - vuln
         - secret
+    skip-dirs:
+        - .git
+        - .husky
+        - node_modules
+    skip-files:
+        - .env
+misconfiguration:
+    scanners:
+        - dockerfile
 pkg:
     include-dev-deps: true
