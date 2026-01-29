@@ -1,9 +1,9 @@
 format: json
-exit-code: 1
+exit-code: 0
 debug: false
-# severity:
-#     - CRITICAL
-#     - HIGH
+severity:
+    - CRITICAL
+    - HIGH
 scan:
     scanners:
         - vuln
