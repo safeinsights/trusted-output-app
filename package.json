@@ -24,6 +24,7 @@
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "@next/eslint-plugin-next": "^15.2.4",
+        "@types/debug": "^4.1.12",
         "@types/jsonwebtoken": "^9.0.7",
         "@types/mock-fs": "^4.13.4",
         "@types/react": "19.2.10",
