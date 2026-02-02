@@ -7,7 +7,7 @@ export default defineConfig({
     test: {
         setupFiles: ['./tests/vitest.setup.ts'],
         mockReset: true,
-        reporters: process.env.CI ? ['basic', 'github-actions'] : ['verbose'],
+        reporters: process.env.CI ? ['default', 'github-actions'] : ['verbose'],
         environment: 'happy-dom',
         include: ['src/**/*.(test).{js,jsx,ts,tsx}'],
         exclude: ['src/components/providers.test.tsx'],
