@@ -1,14 +1,8 @@
-import { isValidUUID, log, saveFile, UPLOAD_DIR, ensureValue } from '@/app/utils'
-import fs from 'fs'
+import { isValidUUID, log, ensureValue } from '@/app/utils'
 import { NextRequest, NextResponse } from 'next/server'
-import path from 'path'
 import { getPublicKeys, ManagementAppPublicKey, uploadResults } from '@/app/management-app-requests'
 import type { PublicKey } from 'si-encryption/job-results/types'
 import { ResultsWriter } from 'si-encryption/job-results/writer'
-
-function isFile(obj: FormDataEntryValue): obj is File {
-    return obj instanceof File
-}
 
 const encryptResults = async (
     jobId: string,
@@ -44,34 +38,31 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
         errorMessage = 'Form data includes unexpected data keys'
     }
 
-    let publicKeys = await getPublicKeys(jobId)
-
-    publicKeys = ensureValue(publicKeys)
-    if (publicKeys.keys.length === 0) {
-        log('No public keys found for job ID: ' + jobId)
-        log('Legacy approval: Saving results in memory ...')
-        const filePath = path.join(UPLOAD_DIR, jobId)
-        if (fs.existsSync(filePath)) {
-            errorMessage = 'Data already exists for jobId'
-        }
-        if (errorMessage.length == 0 && 'file' in body && isFile(body.file)) {
-            await saveFile(body.file, jobId)
-            return NextResponse.json({}, { status: 200 })
-        }
-    } else {
-        log('Encrypting results with public keys ...')
-        const fileType = 'file' in body ? 'result' : 'log'
-        const data: Blob = body.file ? ((await body.file) as Blob) : new Blob([body.logs])
-        const resultsBuffer = await data.arrayBuffer()
-        const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
-        const response = await uploadResults(jobId, encryptedResults, 'application/zip', fileType)
-        if (!response.ok) {
-            errorMessage = `Failed to post encrypted results: ${response.status}`
-        } else {
-            return NextResponse.json({}, { status: 200 })
-        }
+    if (errorMessage.length > 0) {
+        log(errorMessage, 'error')
+        return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-    log(errorMessage, 'error')
-    return NextResponse.json({ error: errorMessage }, { status: 400 })
+    const publicKeys = ensureValue(await getPublicKeys(jobId))
+
+    if (publicKeys.keys.length === 0) {
+        errorMessage = 'No public keys found for job ID: ' + jobId
+        log(errorMessage, 'error')
+        return NextResponse.json({ error: errorMessage }, { status: 400 })
+    }
+
+    log('Encrypting results with public keys ...')
+    const fileType = 'file' in body ? 'result' : 'log'
+    const data: Blob = body.file ? ((await body.file) as Blob) : new Blob([body.logs])
+    const resultsBuffer = await data.arrayBuffer()
+    const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
+    const response = await uploadResults(jobId, encryptedResults, 'application/zip', fileType)
+
+    if (!response.ok) {
+        errorMessage = `Failed to post encrypted results: ${response.status}`
+        log(errorMessage, 'error')
+        return NextResponse.json({ error: errorMessage }, { status: 400 })
+    }
+
+    return NextResponse.json({}, { status: 200 })
 }
