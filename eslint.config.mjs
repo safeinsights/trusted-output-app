@@ -1,19 +1,18 @@
 // eslint.config.mjs
-import { FlatCompat } from '@eslint/eslintrc'
-
-const compat = new FlatCompat({
-    // import.meta.dirname is available after Node.js v20.11.0
-    baseDirectory: import.meta.dirname,
-})
+import nextConfig from 'eslint-config-next'
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+import nextTypescript from 'eslint-config-next/typescript'
+import prettier from 'eslint-config-prettier/flat'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
         ignores: ['src/styles/generated/'],
     },
-    ...compat.extends('next/core-web-vitals'),
-    ...compat.extends('next/typescript'),
-    ...compat.extends('prettier'),
+    ...nextConfig,
+    ...nextCoreWebVitals,
+    ...nextTypescript,
+    prettier,
     {
         rules: {
             // Removing the no-console rule as we can use a wrapper that checks the environment before logging
