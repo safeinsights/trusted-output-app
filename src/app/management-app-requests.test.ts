@@ -36,12 +36,28 @@ describe('uploadResults', () => {
         process.env.MANAGEMENT_APP_API_URL = 'http://bma'
     })
 
-    it('works', async () => {
+    it('works with Blob', async () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
         })
 
         const res = await uploadResults('123', new Blob(), 'application/zip', 'result')
+        expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/results', {
+            method: 'POST',
+            body: expect.any(FormData),
+            headers: {
+                Authorization: expect.any(String),
+            },
+        })
+        expect(res.ok).toBe(true)
+    })
+
+    it('works with Buffer', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+        })
+
+        const res = await uploadResults('123', Buffer.from('test data'), 'application/zip', 'result')
         expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/results', {
             method: 'POST',
             body: expect.any(FormData),

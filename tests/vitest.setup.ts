@@ -1,17 +1,11 @@
-import { afterEach, beforeAll, beforeEach, vi } from 'vitest'
-import { UPLOAD_DIR } from '@/app/utils'
-import mockFs from 'mock-fs'
+import { afterEach, beforeEach } from 'vitest'
 
 const OLD_ENV = process.env
 
 beforeEach(() => {
-    mockFs({
-        [UPLOAD_DIR]: {},
-    })
     process.env = { ...OLD_ENV } // Make a copy
 })
 
 afterEach(() => {
-    mockFs.restore()
     process.env = OLD_ENV // Restore old environment
 })
