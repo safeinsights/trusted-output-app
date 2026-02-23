@@ -11,9 +11,9 @@
         "lint": "eslint . && prettier --check .",
         "lint:fix": "eslint --fix . && prettier --write .",
         "typecheck": "tsc --noEmit",
-        "pre:push": "run-s lint:fix checks",
+        "pre:push": "npm run lint:fix && npm run checks",
         "pre:commit": "npx lint-staged",
-        "checks": "run-p -c typecheck lint",
+        "checks": "npm run typecheck && npm run lint",
         "test": "vitest",
         "ecr:login": "aws ecr get-login-password --profile $AWS_PROFILE --region $AWS_REGION | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com",
         "ecr:create-if-needed": "aws ecr describe-repositories --repository-names trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION || aws ecr create-repository --repository-name trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION",
@@ -34,7 +34,6 @@
         "eslint-config-prettier": "*",
         "happy-dom": "*",
         "husky": "^9.1.7",
-        "npm-run-all": "*",
         "prettier": "*",
         "vite-tsconfig-paths": "^6.0.5",
         "vitest": "*"
@@ -43,7 +42,6 @@
         "jsonwebtoken": "^9.0.2",
         "multer": "^2.0.2",
         "next": "^16.1.6",
-        "next-swagger-doc": "^0.4",
         "react": "19.2.4",
         "react-dom": "19.2.4",
         "si-encryption": "github:safeinsights/encryption",
@@ -51,8 +49,6 @@
     },
     "overrides": {
         "@types/react": "19.2.10",
-        "minimatch": {
-            "brace-expansion": "1.1.12"
-        }
+        "minimatch": ">=10.2.1"
     }
 }
