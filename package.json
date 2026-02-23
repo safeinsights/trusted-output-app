@@ -5,15 +5,15 @@
     "main": "index.js",
     "scripts": {
         "dev": "next dev --turbopack -p 3002",
-        "build": "next build",
+        "build": "unset NODE_ENV && next build",
         "start": "next start -p 3002",
         "docker:build": "docker build --platform=linux/amd64 -t trusted-output-app .",
-        "lint": "next lint && prettier --check .",
-        "lint:fix": "next lint --fix && prettier --write .",
+        "lint": "eslint . && prettier --check .",
+        "lint:fix": "eslint --fix . && prettier --write .",
         "typecheck": "tsc --noEmit",
-        "pre:push": "run-s lint:fix checks",
+        "pre:push": "npm run lint:fix && npm run checks",
         "pre:commit": "npx lint-staged",
-        "checks": "run-p -c typecheck lint",
+        "checks": "npm run typecheck && npm run lint",
         "test": "vitest",
         "ecr:login": "aws ecr get-login-password --profile $AWS_PROFILE --region $AWS_REGION | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text --profile $AWS_PROFILE).dkr.ecr.$AWS_REGION.amazonaws.com",
         "ecr:create-if-needed": "aws ecr describe-repositories --repository-names trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION || aws ecr create-repository --repository-name trusted-output-app --profile $AWS_PROFILE --region $AWS_REGION",
@@ -23,30 +23,25 @@
     },
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
-        "@next/eslint-plugin-next": "^15.2.4",
+        "@next/eslint-plugin-next": "^16.1.6",
         "@types/debug": "^4.1.12",
         "@types/jsonwebtoken": "^9.0.7",
-        "@types/mock-fs": "^4.13.4",
         "@types/react": "19.2.10",
         "@vitejs/plugin-react": "^5.1.3",
         "@vitest/coverage-v8": "^4.0.18",
         "eslint": "*",
-        "eslint-config-next": "15.2.4",
+        "eslint-config-next": "16.1.6",
         "eslint-config-prettier": "*",
         "happy-dom": "*",
         "husky": "^9.1.7",
-        "mock-fs": "^5.4.1",
-        "npm-run-all": "*",
         "prettier": "*",
         "vite-tsconfig-paths": "^6.0.5",
         "vitest": "*"
     },
     "dependencies": {
-        "csv-parse": "^6.1.0",
         "jsonwebtoken": "^9.0.2",
         "multer": "^2.0.2",
-        "next": "^15.5.7",
-        "next-swagger-doc": "^0.4",
+        "next": "^16.1.6",
         "react": "19.2.4",
         "react-dom": "19.2.4",
         "si-encryption": "github:safeinsights/encryption",
@@ -54,8 +49,6 @@
     },
     "overrides": {
         "@types/react": "19.2.10",
-        "minimatch": {
-            "brace-expansion": "1.1.12"
-        }
+        "minimatch": ">=10.2.1"
     }
 }
