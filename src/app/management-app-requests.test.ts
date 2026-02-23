@@ -3,17 +3,17 @@ import { getPublicKeys, uploadResults } from './management-app-requests'
 
 describe('getPublicKeys', () => {
     beforeEach(() => {
-        process.env.MANAGEMENT_APP_API_URL = 'http://bma'
+        process.env.MANAGEMENT_APP_API_URL = 'https://bma'
     })
 
     it('works', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
+        globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
             json: async () => ({ keys: [] }),
         })
 
         const res = await getPublicKeys('123')
-        expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/keys', {
+        expect(globalThis.fetch).toHaveBeenCalledWith('https://bma/api/job/123/keys', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ describe('getPublicKeys', () => {
     })
 
     it('errors if response is not ok', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
+        globalThis.fetch = vi.fn().mockResolvedValue({
             ok: false,
         })
         await expect(getPublicKeys('123')).rejects.toThrow('Failed to fetch public keys for job ID: 123')
@@ -33,16 +33,16 @@ describe('getPublicKeys', () => {
 
 describe('uploadResults', () => {
     beforeEach(() => {
-        process.env.MANAGEMENT_APP_API_URL = 'http://bma'
+        process.env.MANAGEMENT_APP_API_URL = 'https://bma'
     })
 
     it('works with Blob', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
+        globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
         })
 
         const res = await uploadResults('123', new Blob(), 'application/zip', 'result')
-        expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/results', {
+        expect(globalThis.fetch).toHaveBeenCalledWith('https://bma/api/job/123/results', {
             method: 'POST',
             body: expect.any(FormData),
             headers: {
@@ -53,12 +53,12 @@ describe('uploadResults', () => {
     })
 
     it('works with Buffer', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
+        globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
         })
 
         const res = await uploadResults('123', Buffer.from('test data'), 'application/zip', 'result')
-        expect(global.fetch).toHaveBeenCalledWith('http://bma/api/job/123/results', {
+        expect(globalThis.fetch).toHaveBeenCalledWith('https://bma/api/job/123/results', {
             method: 'POST',
             body: expect.any(FormData),
             headers: {
