@@ -52,10 +52,11 @@ export const POST = async (req: NextRequest, { params }: { params: Promise<{ job
     }
 
     log('Encrypting results with public keys ...')
-    const data = body.file as Blob
+    const fileType = 'file' in body ? 'result' : 'log'
+    const data: Blob = body.file ? ((await body.file) as Blob) : new Blob([body.logs])
     const resultsBuffer = await data.arrayBuffer()
     const encryptedResults = await encryptResults(jobId, resultsBuffer, publicKeys.keys)
-    const response = await uploadResults(jobId, encryptedResults, 'application/zip', 'result')
+    const response = await uploadResults(jobId, encryptedResults, 'application/zip', fileType)
 
     if (!response.ok) {
         errorMessage = `Failed to post encrypted results: ${response.status}`
