@@ -50,6 +50,6 @@
     "overrides": {
         "@types/react": "19.2.10",
         "minimatch": ">=10.2.1",
-        "ajv": ">=6.14.0"
+        "ajv": "~6.14.0"
     }
 }

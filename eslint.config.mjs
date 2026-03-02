@@ -5,7 +5,7 @@ import nextTypescript from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier/flat'
 
 /** @type {import('eslint').Linter.Config[]} */
-export default [
+const config = [
     {
         ignores: ['src/styles/generated/'],
     },
@@ -22,3 +22,5 @@ export default [
         },
     },
 ]
+
+export default config
