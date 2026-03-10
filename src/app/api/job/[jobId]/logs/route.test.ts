@@ -1,0 +1,135 @@
+import { describe, expect, it, beforeEach, vi } from 'vitest'
+import { POST } from './route'
+import { NextRequest } from 'next/server'
+import { v4 as uuidv4 } from 'uuid'
+import { pemToJSONBuffer } from 'si-encryption/util'
+
+import * as mgmt from '@/app/management-app-requests'
+
+vi.mock('@/app/management-app-requests.ts')
+
+describe('POST /api/job/[jobId]/logs', () => {
+    it('should return failure if no logs data is included', async () => {
+        const formData = new FormData()
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = Promise.resolve({ jobId: uuidv4() })
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data does not include expected logs key')
+    })
+
+    it('should return failure if unexpected form data is included', async () => {
+        const formData = new FormData()
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'test' }]))
+        formData.append('extra', 'unexpected')
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = Promise.resolve({ jobId: uuidv4() })
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Form data includes unexpected data keys')
+    })
+
+    it('should return failure if jobId is not a UUID', async () => {
+        const formData = new FormData()
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        const params = Promise.resolve({ jobId: '123' })
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('jobId is not a UUID')
+    })
+
+    it('should return an error if no jobID is provided', async () => {
+        const formData = new FormData()
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = Promise.resolve({ jobId: '' })
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+    })
+
+    it('should return an error if no public keys are found', async () => {
+        vi.mocked(mgmt.getPublicKeys).mockResolvedValue({ keys: [] })
+
+        const mockJobId = uuidv4()
+        const formData = new FormData()
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'test' }]))
+
+        const req = {
+            formData: async () => formData,
+        } as NextRequest
+        const params = Promise.resolve({ jobId: mockJobId })
+        const response = await POST(req, { params })
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('No public keys found for job ID: ' + mockJobId)
+    })
+})
+
+describe('POST /api/job/[jobId]/logs with public keys', () => {
+    let req: NextRequest
+    let params: Promise<{ jobId: string }>
+    let mockJobId: string
+
+    beforeEach(() => {
+        vi.mocked(mgmt.getPublicKeys).mockResolvedValue({
+            keys: [
+                {
+                    jobId: 'jobId',
+                    fingerprint: '77c2d18672112a2ecc8428302822a28ee7356c668423dc5a828ed53ccc87150d',
+                    publicKey: pemToJSONBuffer(`MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArd5ojUorKV9l1i/canpo
+4JEKlENlX2VDB5yAkYevUea+hSpVLFnIBbd5n/Qejqs6uUhtxl1LmqPBuB8dMObL
+waqLNWyD0MlHIRlzlLGcJPe7i6Mus2aeeFSGF6bZ/OQ36kbdeJCzM/Q+y3qXfY1j
+rvFChbOTBDV0prpDZNNR6EY29V7YGqxIX9hsU8GrnKC2U1olc35lCVxCyVGFep8j
+2MuTurD4Vb14RJwWUx0T61vgfD/ZRRZWvTtMfMIF7EFmwGrLpFWC8AG6i0ZzAx6H
+cBuz7STvk79l48F5dQKNc43S+FP1KCLF8bSW9xTZ2owCg7d470eftPiIVT539LYH
+c26DLdibeQjzAhFHwiKC3ltfY9zmrpKzvM6s1sloTw/VJD/5v+9+kMEeLs0Yx0su
+junaozRtmGA0F00pdhZDEr+md0MHEaECvmeSrG8iXiHiEuihCfuAV19ld/O0RVDO
+v/RAuzxQGTVe6QMetgEkpRr6Cnlo6fSIdF77D2LEvDH++Nut4MglIyI2/uJ2yAzJ
+ePfWw2aZVF80tm3K5n3NHnn9xHfymeU9XBWFVpf7omt1QbtUv0MDv0WyP168qVnh
+8q/rTZCb0UylRhIrVHcVoDD7ELG+lLjz87CHFxDSrcVxaCnUSDP6kmK19YqpuzET
+daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
+                },
+            ],
+        })
+
+        mockJobId = uuidv4()
+
+        const formData = new FormData()
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'Test log' }]))
+
+        req = {
+            formData: async () => formData,
+        } as NextRequest
+
+        params = Promise.resolve({ jobId: mockJobId })
+    })
+
+    it('should encrypt logs and send to mgmt', async () => {
+        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
+
+        const response = await POST(req, { params })
+
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'log')
+        expect(response.status).toBe(200)
+    })
+
+    it('should return 400 if upload fails', async () => {
+        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: false, status: 'mockstatus' } as unknown as Response)
+
+        const response = await POST(req, { params })
+
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Failed to post encrypted logs: mockstatus')
+    })
+})
