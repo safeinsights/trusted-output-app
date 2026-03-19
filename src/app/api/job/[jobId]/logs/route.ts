@@ -1,6 +1,6 @@
 import { createEncryptAndUploadHandler } from '@/app/api/job/encrypt-and-upload'
 
 export const POST = createEncryptAndUploadHandler({
-    fileType: 'result',
-    extractPayload: (body) => (body.file as Blob).arrayBuffer(),
+    fileType: 'log',
+    extractPayload: (body) => new TextEncoder().encode(body.logs as string).buffer as ArrayBuffer,
 })

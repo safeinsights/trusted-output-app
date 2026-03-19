@@ -31,7 +31,7 @@ export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAp
 export const uploadResults = async (
     jobId: string,
     results: Buffer | Blob,
-    type: 'text/csv' | 'application/zip',
+    type: 'application/zip',
     fileType: 'result' | 'log',
 ) => {
     const formData = new FormData()

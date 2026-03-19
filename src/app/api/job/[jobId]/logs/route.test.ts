@@ -8,10 +8,8 @@ import * as mgmt from '@/app/management-app-requests'
 
 vi.mock('@/app/management-app-requests.ts')
 
-describe('POST /api/job/[jobId]/upload', () => {
-    it('should return failure if no file is uploaded', async () => {
-        vi.mocked(mgmt.getPublicKeys).mockResolvedValue({ keys: [] })
-
+describe('POST /api/job/[jobId]/logs', () => {
+    it('should return failure if no logs data is included', async () => {
         const formData = new FormData()
 
         const req = {
@@ -20,18 +18,13 @@ describe('POST /api/job/[jobId]/upload', () => {
         const params = Promise.resolve({ jobId: uuidv4() })
         const response = await POST(req, { params })
         expect(response.status).toBe(400)
-        expect((await response.json()).error).toBe('Form data does not include expected file key')
+        expect((await response.json()).error).toBe('Form data does not include expected logs key')
     })
 
     it('should return failure if unexpected form data is included', async () => {
-        vi.mocked(mgmt.getPublicKeys).mockResolvedValue({ keys: [] })
-
-        const mockFile = new Blob(['id,name\n1,John'], { type: 'text/csv' })
-        const mockJobId = uuidv4()
-
         const formData = new FormData()
-        formData.append('file', new File([mockFile], mockJobId))
-        formData.append('file2', new File([mockFile], mockJobId))
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'test' }]))
+        formData.append('extra', 'unexpected')
 
         const req = {
             formData: async () => formData,
@@ -71,7 +64,7 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const mockJobId = uuidv4()
         const formData = new FormData()
-        formData.append('file', new File(['data'], mockJobId))
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'test' }]))
 
         const req = {
             formData: async () => formData,
@@ -83,7 +76,7 @@ describe('POST /api/job/[jobId]/upload', () => {
     })
 })
 
-describe('POST /api/job/[jobId]/upload with public keys', () => {
+describe('POST /api/job/[jobId]/logs with public keys', () => {
     let req: NextRequest
     let params: Promise<{ jobId: string }>
     let mockJobId: string
@@ -110,11 +103,10 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
             ],
         })
 
-        // Mock data to send in
         mockJobId = uuidv4()
 
         const formData = new FormData()
-        formData.append('file', new File(['id,name\n1,John'], 'test.zip', { type: 'application/zip' }))
+        formData.append('logs', JSON.stringify([{ timestamp: 1, message: 'Test log' }]))
 
         req = {
             formData: async () => formData,
@@ -123,12 +115,12 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
         params = Promise.resolve({ jobId: mockJobId })
     })
 
-    it('should encrypt results and send to mgmt', async () => {
+    it('should encrypt logs and send to mgmt', async () => {
         vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
 
         const response = await POST(req, { params })
 
-        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'log')
         expect(response.status).toBe(200)
     })
 
@@ -138,6 +130,6 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
         const response = await POST(req, { params })
 
         expect(response.status).toBe(400)
-        expect((await response.json()).error).toBe('Failed to post encrypted results: mockstatus')
+        expect((await response.json()).error).toBe('Failed to post encrypted logs: mockstatus')
     })
 })

@@ -1,30 +1,5 @@
-import path from 'path'
-import fs from 'fs'
-import os from 'os'
 import jwt from 'jsonwebtoken'
 import { validate as uuidValidate } from 'uuid'
-
-export const UPLOAD_DIR = path.resolve(os.tmpdir(), 'public/uploads')
-
-export const createUploadDirIfNotExists = () => {
-    log(`Creating upload directory at ${UPLOAD_DIR}`)
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-    }
-}
-
-export const saveFile = async (file: Blob, jobId: string) => {
-    createUploadDirIfNotExists()
-    log(`Saving file for job ID: ${jobId}`)
-    const buffer = Buffer.from(await file.arrayBuffer())
-    fs.writeFileSync(path.resolve(UPLOAD_DIR, jobId), buffer)
-}
-
-export const deleteFile = async (jobId: string) => {
-    createUploadDirIfNotExists()
-    log(`Deleting file for job ID: ${jobId}`)
-    fs.unlinkSync(path.resolve(UPLOAD_DIR, jobId))
-}
 
 export const generateAuthorizationHeaders = () => {
     log('BMA: Generating authorization headers')
