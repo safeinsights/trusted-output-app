@@ -13,10 +13,11 @@ const formDataKeys: Record<FileType, string> = {
 interface UploadHandlerConfig {
     fileType: FileType
     extractPayload: (_body: Record<string, FormDataEntryValue>) => ArrayBuffer | Promise<ArrayBuffer>
+    extractPayloadName: (_body: Record<string, FormDataEntryValue>) => string
 }
 
 export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
-    const { fileType, extractPayload } = config
+    const { fileType, extractPayload, extractPayloadName } = config
     const formDataKey = formDataKeys[fileType]
     const label = fileType === 'result' ? 'results' : 'logs'
 
@@ -52,7 +53,8 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
 
         log(`Encrypting ${label} with public keys ...`)
         const payload = await extractPayload(body)
-        const encrypted = await encryptResults(jobId, payload, publicKeys.keys)
+        const fileName = extractPayloadName(body)
+        const encrypted = await encryptResults(fileName, payload, publicKeys.keys)
         const response = await uploadResults(jobId, encrypted, 'application/zip', fileType)
 
         if (!response.ok) {
