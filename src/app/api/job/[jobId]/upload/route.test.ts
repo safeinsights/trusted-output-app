@@ -107,7 +107,7 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
         mockJobId = uuidv4()
 
         const formData = new FormData()
-        formData.append('file', new File(['id,name\n1,John'], 'test.zip', { type: 'application/zip' }))
+        formData.append('file', new File(['id,name\n1,John'], 'cool_results.csv', { type: 'text/csv' }))
 
         req = {
             formData: async () => formData,
@@ -123,6 +123,20 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
 
         expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
         expect(response.status).toBe(200)
+
+        const encryptedResults = vi.mocked(mgmt.uploadResults).mock.calls[0][1]
+
+        const reader = new ResultsReader(
+            encryptedResults as Blob,
+            pemToArrayBuffer(keyPair.privateKeyString),
+            keyPair.fingerprint,
+        )
+
+        const uploadedFiles = await reader.extractFiles()
+        expect(Object.keys(reader.manifest.files)).toHaveLength(1)
+        expect(uploadedFiles).toHaveLength(1)
+        expect(uploadedFiles[0].path).toEqual('cool_results.csv')
+        expect(new TextDecoder().decode(uploadedFiles[0].contents)).toEqual('id,name\n1,John')
     })
 
     it('should encrypt multiple files into a single zip and send to mgmt', async () => {
