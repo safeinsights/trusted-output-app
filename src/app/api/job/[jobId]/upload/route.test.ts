@@ -2,7 +2,8 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
-import { pemToJSONBuffer } from 'si-encryption/util'
+import { generateKeyPair, pemToArrayBuffer, pemToJSONBuffer } from 'si-encryption/util'
+import { ResultsReader } from 'si-encryption/job-results'
 
 import * as mgmt from '@/app/management-app-requests'
 
@@ -87,25 +88,17 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
     let req: NextRequest
     let params: Promise<{ jobId: string }>
     let mockJobId: string
+    let keyPair: Awaited<ReturnType<typeof generateKeyPair>>
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        keyPair = await generateKeyPair()
+
         vi.mocked(mgmt.getPublicKeys).mockResolvedValue({
             keys: [
                 {
                     jobId: 'jobId',
-                    fingerprint: '77c2d18672112a2ecc8428302822a28ee7356c668423dc5a828ed53ccc87150d',
-                    publicKey: pemToJSONBuffer(`MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArd5ojUorKV9l1i/canpo
-4JEKlENlX2VDB5yAkYevUea+hSpVLFnIBbd5n/Qejqs6uUhtxl1LmqPBuB8dMObL
-waqLNWyD0MlHIRlzlLGcJPe7i6Mus2aeeFSGF6bZ/OQ36kbdeJCzM/Q+y3qXfY1j
-rvFChbOTBDV0prpDZNNR6EY29V7YGqxIX9hsU8GrnKC2U1olc35lCVxCyVGFep8j
-2MuTurD4Vb14RJwWUx0T61vgfD/ZRRZWvTtMfMIF7EFmwGrLpFWC8AG6i0ZzAx6H
-cBuz7STvk79l48F5dQKNc43S+FP1KCLF8bSW9xTZ2owCg7d470eftPiIVT539LYH
-c26DLdibeQjzAhFHwiKC3ltfY9zmrpKzvM6s1sloTw/VJD/5v+9+kMEeLs0Yx0su
-junaozRtmGA0F00pdhZDEr+md0MHEaECvmeSrG8iXiHiEuihCfuAV19ld/O0RVDO
-v/RAuzxQGTVe6QMetgEkpRr6Cnlo6fSIdF77D2LEvDH++Nut4MglIyI2/uJ2yAzJ
-ePfWw2aZVF80tm3K5n3NHnn9xHfymeU9XBWFVpf7omt1QbtUv0MDv0WyP168qVnh
-8q/rTZCb0UylRhIrVHcVoDD7ELG+lLjz87CHFxDSrcVxaCnUSDP6kmK19YqpuzET
-daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
+                    fingerprint: keyPair.fingerprint,
+                    publicKey: pemToJSONBuffer(keyPair.publicKeyString),
                 },
             ],
         })
@@ -130,6 +123,43 @@ daz67mcy8FIz1nBJ4z9P7ekCAwEAAQ==`),
 
         expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
         expect(response.status).toBe(200)
+    })
+
+    it('should encrypt multiple files into a single zip and send to mgmt', async () => {
+        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
+
+        const formData = new FormData()
+        formData.append('file', new File(['id,name\n1,John'], 'results_a.csv', { type: 'text/csv' }))
+        formData.append('file', new File(['col1,col2\nx,y'], 'results_b.csv', { type: 'text/csv' }))
+
+        const multiReq = {
+            formData: async () => formData,
+        } as NextRequest
+        const multiParams = Promise.resolve({ jobId: mockJobId })
+
+        const response = await POST(multiReq, { params: multiParams })
+
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
+        expect(response.status).toBe(200)
+
+        const encryptedResults = vi.mocked(mgmt.uploadResults).mock.calls[0][1]
+        const reader = new ResultsReader(
+            encryptedResults as Blob,
+            pemToArrayBuffer(keyPair.privateKeyString),
+            keyPair.fingerprint,
+        )
+
+        const uploadedFiles = await reader.extractFiles()
+        expect(uploadedFiles).toHaveLength(2)
+
+        const fileA = uploadedFiles.find((f) => f.path === 'results_a.csv')
+        const fileB = uploadedFiles.find((f) => f.path === 'results_b.csv')
+
+        expect(fileA).toBeDefined()
+        expect(new TextDecoder().decode(fileA!.contents)).toEqual('id,name\n1,John')
+
+        expect(fileB).toBeDefined()
+        expect(new TextDecoder().decode(fileB!.contents)).toEqual('col1,col2\nx,y')
     })
 
     it('should return 400 if upload fails', async () => {
