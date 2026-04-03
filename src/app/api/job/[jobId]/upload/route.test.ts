@@ -2,8 +2,8 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
-import { pemToJSONBuffer, pemToArrayBuffer, generateKeyPair } from 'si-encryption/util'
-import { ResultsReader } from 'si-encryption/job-results/reader'
+import { generateKeyPair, pemToArrayBuffer, pemToJSONBuffer } from 'si-encryption/util'
+import { ResultsReader } from 'si-encryption/job-results'
 
 import * as mgmt from '@/app/management-app-requests'
 
@@ -84,19 +84,21 @@ describe('POST /api/job/[jobId]/upload', () => {
     })
 })
 
-describe('POST /api/job/[jobId]/upload with public keys', async () => {
+describe('POST /api/job/[jobId]/upload with public keys', () => {
     let req: NextRequest
     let params: Promise<{ jobId: string }>
     let mockJobId: string
-    const keyPair = await generateKeyPair()
+    let keyPair: Awaited<ReturnType<typeof generateKeyPair>>
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        keyPair = await generateKeyPair()
+
         vi.mocked(mgmt.getPublicKeys).mockResolvedValue({
             keys: [
                 {
                     jobId: 'jobId',
-                    publicKey: pemToJSONBuffer(keyPair.publicKeyString),
                     fingerprint: keyPair.fingerprint,
+                    publicKey: pemToJSONBuffer(keyPair.publicKeyString),
                 },
             ],
         })
@@ -135,6 +137,43 @@ describe('POST /api/job/[jobId]/upload with public keys', async () => {
         expect(uploadedFiles).toHaveLength(1)
         expect(uploadedFiles[0].path).toEqual('cool_results.csv')
         expect(new TextDecoder().decode(uploadedFiles[0].contents)).toEqual('id,name\n1,John')
+    })
+
+    it('should encrypt multiple files into a single zip and send to mgmt', async () => {
+        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
+
+        const formData = new FormData()
+        formData.append('file', new File(['id,name\n1,John'], 'results_a.csv', { type: 'text/csv' }))
+        formData.append('file', new File(['col1,col2\nx,y'], 'results_b.csv', { type: 'text/csv' }))
+
+        const multiReq = {
+            formData: async () => formData,
+        } as NextRequest
+        const multiParams = Promise.resolve({ jobId: mockJobId })
+
+        const response = await POST(multiReq, { params: multiParams })
+
+        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
+        expect(response.status).toBe(200)
+
+        const encryptedResults = vi.mocked(mgmt.uploadResults).mock.calls[0][1]
+        const reader = new ResultsReader(
+            encryptedResults as Blob,
+            pemToArrayBuffer(keyPair.privateKeyString),
+            keyPair.fingerprint,
+        )
+
+        const uploadedFiles = await reader.extractFiles()
+        expect(uploadedFiles).toHaveLength(2)
+
+        const fileA = uploadedFiles.find((f) => f.path === 'results_a.csv')
+        const fileB = uploadedFiles.find((f) => f.path === 'results_b.csv')
+
+        expect(fileA).toBeDefined()
+        expect(new TextDecoder().decode(fileA!.contents)).toEqual('id,name\n1,John')
+
+        expect(fileB).toBeDefined()
+        expect(new TextDecoder().decode(fileB!.contents)).toEqual('col1,col2\nx,y')
     })
 
     it('should return 400 if upload fails', async () => {
