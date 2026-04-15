@@ -2,7 +2,7 @@ FROM node:22-alpine AS base
 
 
 ARG USER=node
-ENV HOME /home/$USER 
+ENV HOME /home/$USER
 
 # Alpine doesn't have curl, so add it
 RUN apk --no-cache add curl
@@ -12,7 +12,7 @@ USER $USER
 WORKDIR $HOME/app
 
 # Copy the package.json and lock file to install dependencies
-COPY --chown=$USER:$USER package.json package-lock.json panda.config.ts ./
+COPY --chown=$USER:$USER package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install

@@ -22,10 +22,6 @@ This happens if there are 0 results encryption keys for that organization in the
 
 ## Development
 
-### TOA Authentication
-
-Set the `HTTP_BASIC_AUTH` variable in `.env`. Example values `username:password` or `admin:password`
-
 ### Hitting the upload endpoint:
 
 1. Create a study on the Management App
@@ -34,9 +30,8 @@ Set the `HTTP_BASIC_AUTH` variable in `.env`. Example values `username:password`
 1. Take that uuid and upload it manually like so:
 
     ```bash
-    curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/industry.csv" -u <HTTP_BASIC_AUTH>
-
-    curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/currency.csv" -u <HTTP_BASIC_AUTH>
+    curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/industry.csv"
+    curl -X POST http://localhost:3002/api/job/:jobId/upload -F "file=@test-data/currency.csv"
     ```
 
 1. Approve the study with the UUID you just uploaded
