@@ -53,3 +53,7 @@ echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 
 - `aws sso login --profile your-profile`
 - `AWS_PROFILE=your-profile AWS_REGION=your-region npm run deploy:ecr`
+
+## License
+
+This application is released under the [GNU Affero General Public License v3.0](LICENSE). It bundles third-party components covered by separate licenses, including LGPL-3.0-or-later code (`libvips`, via `sharp`). See [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) for the complete list, source-availability information, and notes on how to exercise LGPL rights against the distributed image.

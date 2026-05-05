@@ -42,6 +42,7 @@ jobs:
                   scanners: 'license'
                   severity: 'HIGH,CRITICAL'
                   exit-code: '1'
+                  trivyignores: '.trivyignore.yaml'
             - name: Run SonarQube SAST Scan
               uses: SonarSource/sonarqube-scan-action@v6
               env:
