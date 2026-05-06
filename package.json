@@ -32,6 +32,7 @@
         "eslint": "*",
         "eslint-config-next": "^16.1.6",
         "eslint-config-prettier": "*",
+        "eslint-plugin-anti-trojan-source": "^1.1.4",
         "happy-dom": "*",
         "husky": "^9.1.7",
         "prettier": "*",

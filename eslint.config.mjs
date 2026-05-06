@@ -3,6 +3,7 @@ import nextConfig from 'eslint-config-next'
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import nextTypescript from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier/flat'
+import antiTrojanSource from 'eslint-plugin-anti-trojan-source'
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
@@ -13,6 +14,10 @@ const config = [
     ...nextCoreWebVitals,
     ...nextTypescript,
     prettier,
+    {
+        plugins: { 'anti-trojan-source': antiTrojanSource },
+        rules: { 'anti-trojan-source/no-bidi': 'error' },
+    },
     {
         rules: {
             // Removing the no-console rule as we can use a wrapper that checks the environment before logging
