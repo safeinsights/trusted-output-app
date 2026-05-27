@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+.pnpm-store/
+node_modules/
+.next/
+next-env.d.ts
+coverage/
+test-results/
+THIRD_PARTY_LICENSES.md
+.claude/

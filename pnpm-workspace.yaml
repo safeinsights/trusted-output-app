@@ -1,0 +1,5 @@
+allowBuilds:
+    fsevents: true
+    sharp: true
+    unrs-resolver: true
+minimumReleaseAge: 2880

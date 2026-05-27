@@ -52,7 +52,7 @@ echo "MANAGEMENT_APP_PRIVATE_KEY='`cat ./private_key.pem`'" >> .env
 ### To push image to ECR
 
 - `aws sso login --profile your-profile`
-- `AWS_PROFILE=your-profile AWS_REGION=your-region npm run deploy:ecr`
+- `AWS_PROFILE=your-profile AWS_REGION=your-region pnpm run deploy:ecr`
 
 ## License
 

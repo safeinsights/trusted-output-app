@@ -16,6 +16,7 @@ yarn-error.log*
 tmp/
 node_modules/
 .npm
+.pnpm-store/
 *.tsbuildinfo
 .eslintcache
 
