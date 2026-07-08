@@ -1,31 +1,42 @@
 // eslint.config.mjs
-import nextConfig from 'eslint-config-next'
-import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
-import nextTypescript from 'eslint-config-next/typescript'
+import js from '@eslint/js'
+import tseslint from 'typescript-eslint'
 import prettier from 'eslint-config-prettier/flat'
 import antiTrojanSource from 'eslint-plugin-anti-trojan-source'
 
-/** @type {import('eslint').Linter.Config[]} */
-const config = [
+export default tseslint.config(
     {
-        ignores: ['src/styles/generated/'],
+        ignores: ['dist/', 'coverage/'],
     },
-    ...nextConfig,
-    ...nextCoreWebVitals,
-    ...nextTypescript,
+    js.configs.recommended,
+    ...tseslint.configs.recommended,
     prettier,
+    {
+        // Node globals for JS/CJS/MJS config files (e.g. vitest.config.mjs), which
+        // are not TypeScript and so keep core `no-undef` active.
+        files: ['**/*.{js,cjs,mjs}'],
+        languageOptions: {
+            globals: {
+                process: 'readonly',
+                console: 'readonly',
+                __dirname: 'readonly',
+                module: 'readonly',
+                require: 'readonly',
+            },
+        },
+    },
     {
         plugins: { 'anti-trojan-source': antiTrojanSource },
         rules: { 'anti-trojan-source/no-bidi': 'error' },
     },
     {
         rules: {
-            // Removing the no-console rule as we can use a wrapper that checks the environment before logging
-            // 'no-console': ['error', { allow: ['warn', 'error', 'log'] }],
-            'no-unused-vars': ['error', { ignoreRestSiblings: true, varsIgnorePattern: '_+', argsIgnorePattern: '^_' }],
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                { ignoreRestSiblings: true, varsIgnorePattern: '_+', argsIgnorePattern: '^_' },
+            ],
             semi: ['error', 'never'],
         },
     },
-]
-
-export default config
+)

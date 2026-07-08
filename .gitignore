@@ -22,6 +22,7 @@ node_modules/
 
 # Build outputs
 .next/
+dist/
 coverage/
 
 # Test results

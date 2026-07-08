@@ -1,4 +1,4 @@
-import { ManagementAppPublicKey } from '@/app/management-app-requests'
+import { ManagementAppPublicKey } from '@/lib/management-app-requests'
 import type { PublicKey } from 'si-encryption/job-results/types'
 import { ResultsWriter } from 'si-encryption/job-results/writer'
 

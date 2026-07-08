@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { generateAuthorizationHeaders } from '@/app/utils'
+import { json } from '@/http/json'
+import type { RouteHandler } from '@/http/router'
+import { generateAuthorizationHeaders } from '@/lib/utils'
 
 enum AllowedStatusUpdates {
     JOB_PROVISIONING = 'JOB-PROVISIONING',
@@ -45,17 +46,17 @@ function isJobStatusUpdateRequest(data: any): data is JobStatusUpdateRequest {
     return true
 }
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ jobId: string }> }) {
-    const jobId = (await params).jobId
+export const updateJobStatus: RouteHandler = async (request, params) => {
+    const jobId = params.jobId
 
     if (!jobId) {
-        return NextResponse.json({ error: 'Missing jobId' }, { status: 400 })
+        return json({ error: 'Missing jobId' }, 400)
     }
 
     const requestData = await request.json()
 
     if (!isJobStatusUpdateRequest(requestData)) {
-        return NextResponse.json({ error: 'Malformed request data' }, { status: 400 })
+        return json({ error: 'Malformed request data' }, 400)
     }
 
     const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}`
@@ -68,8 +69,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     })
 
     if (!response.ok) {
-        return NextResponse.json({ error: 'Unable to update job status' }, { status: 500 })
+        return json({ error: 'Unable to update job status' }, 500)
     }
 
-    return NextResponse.json({}, { status: 200 })
+    return json({}, 200)
 }
