@@ -1,13 +1,12 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { POST } from './route'
-import { NextRequest } from 'next/server'
+import { uploadResults } from './upload'
 import { v4 as uuidv4 } from 'uuid'
 import { generateKeyPair, pemToArrayBuffer, pemToJSONBuffer } from 'si-encryption/util'
 import { ResultsReader } from 'si-encryption/job-results'
 
-import * as mgmt from '@/app/management-app-requests'
+import * as mgmt from '@/management-app-requests'
 
-vi.mock('@/app/management-app-requests.ts')
+vi.mock('@/management-app-requests.ts')
 
 describe('POST /api/job/[jobId]/upload', () => {
     it('should return failure if no file is uploaded', async () => {
@@ -17,9 +16,9 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const req = {
             formData: async () => formData,
-        } as NextRequest
-        const params = Promise.resolve({ jobId: uuidv4() })
-        const response = await POST(req, { params })
+        } as unknown as Request
+        const params = { jobId: uuidv4() }
+        const response = await uploadResults(req, params)
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Form data does not include expected file key')
     })
@@ -36,9 +35,9 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const req = {
             formData: async () => formData,
-        } as NextRequest
-        const params = Promise.resolve({ jobId: uuidv4() })
-        const response = await POST(req, { params })
+        } as unknown as Request
+        const params = { jobId: uuidv4() }
+        const response = await uploadResults(req, params)
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Form data includes unexpected data keys')
     })
@@ -48,10 +47,10 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const req = {
             formData: async () => formData,
-        } as NextRequest
+        } as unknown as Request
 
-        const params = Promise.resolve({ jobId: '123' })
-        const response = await POST(req, { params })
+        const params = { jobId: '123' }
+        const response = await uploadResults(req, params)
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('jobId is not a UUID')
     })
@@ -61,9 +60,9 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const req = {
             formData: async () => formData,
-        } as NextRequest
-        const params = Promise.resolve({ jobId: '' })
-        const response = await POST(req, { params })
+        } as unknown as Request
+        const params = { jobId: '' }
+        const response = await uploadResults(req, params)
         expect(response.status).toBe(400)
     })
 
@@ -76,17 +75,17 @@ describe('POST /api/job/[jobId]/upload', () => {
 
         const req = {
             formData: async () => formData,
-        } as NextRequest
-        const params = Promise.resolve({ jobId: mockJobId })
-        const response = await POST(req, { params })
+        } as unknown as Request
+        const params = { jobId: mockJobId }
+        const response = await uploadResults(req, params)
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('No public keys found for job ID: ' + mockJobId)
     })
 })
 
 describe('POST /api/job/[jobId]/upload with public keys', () => {
-    let req: NextRequest
-    let params: Promise<{ jobId: string }>
+    let req: Request
+    let params: { jobId: string }
     let mockJobId: string
     let keyPair: Awaited<ReturnType<typeof generateKeyPair>>
 
@@ -111,15 +110,15 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
 
         req = {
             formData: async () => formData,
-        } as NextRequest
+        } as unknown as Request
 
-        params = Promise.resolve({ jobId: mockJobId })
+        params = { jobId: mockJobId }
     })
 
     it('should encrypt results and send to mgmt', async () => {
         vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
 
-        const response = await POST(req, { params })
+        const response = await uploadResults(req, params)
 
         expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
         expect(response.status).toBe(200)
@@ -148,10 +147,10 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
 
         const multiReq = {
             formData: async () => formData,
-        } as NextRequest
-        const multiParams = Promise.resolve({ jobId: mockJobId })
+        } as unknown as Request
+        const multiParams = { jobId: mockJobId }
 
-        const response = await POST(multiReq, { params: multiParams })
+        const response = await uploadResults(multiReq, multiParams)
 
         expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
         expect(response.status).toBe(200)
@@ -179,7 +178,7 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
     it('should return 400 if upload fails', async () => {
         vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: false, status: 'mockstatus' } as unknown as Response)
 
-        const response = await POST(req, { params })
+        const response = await uploadResults(req, params)
 
         expect(response.status).toBe(400)
         expect((await response.json()).error).toBe('Failed to post encrypted results: mockstatus')

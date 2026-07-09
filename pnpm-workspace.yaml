@@ -1,5 +1,8 @@
+packages:
+  - vendor/encryption
 allowBuilds:
-    fsevents: true
-    sharp: true
-    unrs-resolver: true
+  esbuild: true
+  fsevents: true
+  sharp: true
+  unrs-resolver: true
 minimumReleaseAge: 2880

@@ -1,0 +1,3 @@
+[submodule "vendor/encryption"]
+	path = vendor/encryption
+	url = https://github.com/safeinsights/encryption.git

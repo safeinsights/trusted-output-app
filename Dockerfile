@@ -20,15 +20,15 @@ COPY --chown=$USER:$USER package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the application files
+# Copy the rest of the application files (includes the vendor/encryption submodule)
 COPY --chown=$USER:$USER . .
 
-# Build the Next.js app
+# Bundle the app (and the raw-TS si-encryption dependency) into a self-contained dist/server.mjs
 RUN pnpm run build
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:3002/api/health || exit 1
 
 EXPOSE 3002
 
-# Start the Next.js app in production mode
+# Start the bundled app in production mode
 CMD ["pnpm", "run", "start"]

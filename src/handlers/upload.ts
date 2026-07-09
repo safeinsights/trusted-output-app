@@ -1,6 +1,6 @@
-import { createEncryptAndUploadHandler } from '@/app/api/job/encrypt-and-upload'
+import { createEncryptAndUploadHandler } from '@/handlers/encrypt-and-upload'
 
-export const POST = createEncryptAndUploadHandler({
+export const uploadResults = createEncryptAndUploadHandler({
     fileType: 'result',
     extractPayloads: async (formData) => {
         const entries = formData.getAll('file')

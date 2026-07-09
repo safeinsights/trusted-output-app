@@ -11,27 +11,14 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "jsx": "react-jsx",
         "incremental": true,
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
         "paths": {
             "@/*": ["./src/*"],
             "@/test-utils": ["./test-utils"],
             "@/tests/*": ["./tests/*"]
         },
-        "types": ["vitest/globals"]
+        "types": ["vitest/globals", "node"]
     },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        ".next/types/**/*.ts",
-        "vitest.config.mjs",
-        ".next/dev/types/**/*.ts"
-    ],
-    "exclude": ["node_modules"]
+    "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.mjs"],
+    "exclude": ["node_modules", "vendor", "dist"]
 }

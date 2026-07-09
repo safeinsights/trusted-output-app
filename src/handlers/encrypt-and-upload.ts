@@ -1,7 +1,6 @@
-import { isValidUUID, log, ensureValue } from '@/app/utils'
-import { NextRequest, NextResponse } from 'next/server'
-import { getPublicKeys, uploadResults } from '@/app/management-app-requests'
-import { encryptResults, type EncryptableFile } from '@/app/api/job/encrypt-results'
+import { isValidUUID, log, ensureValue } from '@/utils'
+import { getPublicKeys, uploadResults } from '@/management-app-requests'
+import { encryptResults, type EncryptableFile } from '@/handlers/encrypt-results'
 
 type FileType = 'result' | 'log'
 
@@ -27,14 +26,14 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
     const formDataKey = formDataKeys[fileType]
     const label = fileType === 'result' ? 'results' : 'logs'
 
-    return async (req: NextRequest, { params }: { params: Promise<{ jobId: string }> }) => {
-        const [formData, { jobId }] = await Promise.all([req.formData(), params])
+    return async (req: Request, { jobId }: { jobId: string }) => {
+        const formData = await req.formData()
 
         log(`Received ${label} upload request for jobId ${jobId}`)
 
         if (!isValidUUID(jobId)) {
             log('jobId is not a UUID', 'error')
-            return NextResponse.json({ error: 'jobId is not a UUID' }, { status: 400 })
+            return Response.json({ error: 'jobId is not a UUID' }, { status: 400 })
         }
 
         let files: EncryptableFile[]
@@ -45,12 +44,12 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
             if (!(formDataKey in body)) {
                 const msg = `Form data does not include expected ${formDataKey} key`
                 log(msg, 'error')
-                return NextResponse.json({ error: msg }, { status: 400 })
+                return Response.json({ error: msg }, { status: 400 })
             }
 
             if (Object.keys(body).length !== 1) {
                 log('Form data includes unexpected data keys', 'error')
-                return NextResponse.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
+                return Response.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
             }
 
             files = await config.extractPayloads(body)
@@ -60,12 +59,12 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
             if (keys.length === 0) {
                 const msg = `Form data does not include expected ${formDataKey} key`
                 log(msg, 'error')
-                return NextResponse.json({ error: msg }, { status: 400 })
+                return Response.json({ error: msg }, { status: 400 })
             }
 
             if (!keys.every((k) => k === formDataKey)) {
                 log('Form data includes unexpected data keys', 'error')
-                return NextResponse.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
+                return Response.json({ error: 'Form data includes unexpected data keys' }, { status: 400 })
             }
 
             files = await config.extractPayloads(formData)
@@ -74,7 +73,7 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
         if (files.length === 0) {
             const msg = `No ${label} provided`
             log(msg, 'error')
-            return NextResponse.json({ error: msg }, { status: 400 })
+            return Response.json({ error: msg }, { status: 400 })
         }
 
         const publicKeys = ensureValue(await getPublicKeys(jobId))
@@ -82,7 +81,7 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
         if (publicKeys.keys.length === 0) {
             const msg = 'No public keys found for job ID: ' + jobId
             log(msg, 'error')
-            return NextResponse.json({ error: msg }, { status: 400 })
+            return Response.json({ error: msg }, { status: 400 })
         }
 
         log(`Encrypting ${label} with public keys ...`)
@@ -92,9 +91,9 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig) => {
         if (!response.ok) {
             const msg = `Failed to post encrypted ${label}: ${response.status}`
             log(msg, 'error')
-            return NextResponse.json({ error: msg }, { status: 400 })
+            return Response.json({ error: msg }, { status: 400 })
         }
 
-        return NextResponse.json({}, { status: 200 })
+        return Response.json({}, { status: 200 })
     }
 }
