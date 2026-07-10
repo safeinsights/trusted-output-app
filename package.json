@@ -2,7 +2,6 @@
     "name": "trusted-output-app",
     "version": "0.0.1",
     "description": "Trusted Output App",
-    "main": "index.js",
     "packageManager": "pnpm@11.1.3",
     "engines": {
         "node": ">=22",
