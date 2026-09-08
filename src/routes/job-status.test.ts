@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { updateJobStatus } from './job-status'
 import { v4 } from 'uuid'
 
-vi.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/lib/utils')>()),
     generateAuthorizationHeaders: () => {
         return { Authorization: 'Bearer tokenvalue' }
     },
@@ -12,14 +13,23 @@ vi.mock('@/lib/utils', () => ({
 describe('PUT /api/job/:jobId', () => {
     const jobId = v4()
 
-    it('should return 400 if jobId is missing', async () => {
-        const req = new Request('http://localhost', { method: 'PUT' })
-        const params = { jobId: '' }
-        const res = await updateJobStatus(req, params)
+    it('should return 400 without contacting the BMA if jobId is not a UUID', async () => {
+        const mockBMAResponse = vi.fn()
+        vi.stubGlobal('fetch', mockBMAResponse)
+        process.env.MANAGEMENT_APP_API_URL = 'http://bma'
+
+        // A well-formed body, so the UUID check is the only thing between this request and an
+        // outbound PUT carrying our member JWT. The jobId is what the router hands us for
+        // PUT /api/job/%2E%2E%2F%2E%2E%2Fapi%2Fadmin.
+        const req = new Request('http://localhost', {
+            method: 'PUT',
+            body: JSON.stringify({ status: 'JOB-RUNNING' }),
+        })
+        const res = await updateJobStatus(req, { jobId: '../../api/admin' })
 
         expect(res.status).toBe(400)
-        const data = await res.json()
-        expect(data).toEqual({ error: 'Missing jobId' })
+        expect(await res.json()).toEqual({ error: 'jobId is not a UUID' })
+        expect(mockBMAResponse).not.toHaveBeenCalled()
     })
 
     it('should return 400 if JSON data is not of expected shape', async () => {

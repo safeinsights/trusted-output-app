@@ -1,6 +1,6 @@
 import { json } from '@/http/json'
 import type { RouteHandler } from '@/http/router'
-import { generateAuthorizationHeaders } from '@/lib/utils'
+import { generateAuthorizationHeaders, isValidUUID } from '@/lib/utils'
 
 enum AllowedStatusUpdates {
     JOB_PROVISIONING = 'JOB-PROVISIONING',
@@ -49,8 +49,8 @@ function isJobStatusUpdateRequest(data: any): data is JobStatusUpdateRequest {
 export const updateJobStatus: RouteHandler = async (request, params) => {
     const jobId = params.jobId
 
-    if (!jobId) {
-        return json({ error: 'Missing jobId' }, 400)
+    if (!isValidUUID(jobId)) {
+        return json({ error: 'jobId is not a UUID' }, 400)
     }
 
     const requestData = await request.json()
