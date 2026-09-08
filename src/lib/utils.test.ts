@@ -1,4 +1,4 @@
-import { ensureValue, generateAuthorizationHeaders, isValidUUID, log } from './utils'
+import { assertRequiredEnv, ensureValue, generateAuthorizationHeaders, isValidUUID, log, requiredEnv } from './utils'
 import jwt from 'jsonwebtoken'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -20,15 +20,49 @@ describe('Utils', () => {
             expect(tokenSpy).toHaveBeenCalledWith({ iss: memberId }, privateKey, { algorithm: 'RS256', expiresIn: 60 })
         })
 
-        it('should return an empty Authorization header if privateKey or memberId is missing', () => {
-            delete process.env.MANAGEMENT_APP_PRIVATE_KEY
+        it.each(['MANAGEMENT_APP_PRIVATE_KEY', 'MANAGEMENT_APP_MEMBER_ID'] as const)(
+            'should throw rather than emit an unsigned Bearer token when %s is missing',
+            (name) => {
+                process.env.MANAGEMENT_APP_PRIVATE_KEY = 'private-key'
+                process.env.MANAGEMENT_APP_MEMBER_ID = 'member-id'
+                delete process.env[name]
+
+                expect(() => generateAuthorizationHeaders()).toThrow(`Missing required environment variable: ${name}`)
+            },
+        )
+    })
+
+    describe('requiredEnv', () => {
+        it('should return the value when set', () => {
+            process.env.MANAGEMENT_APP_API_URL = 'https://bma'
+            expect(requiredEnv('MANAGEMENT_APP_API_URL')).toBe('https://bma')
+        })
+
+        it('should treat an empty value as missing', () => {
+            process.env.MANAGEMENT_APP_API_URL = ''
+            expect(() => requiredEnv('MANAGEMENT_APP_API_URL')).toThrow(
+                'Missing required environment variable: MANAGEMENT_APP_API_URL',
+            )
+        })
+    })
+
+    describe('assertRequiredEnv', () => {
+        it('should list every missing variable', () => {
+            delete process.env.MANAGEMENT_APP_API_URL
             delete process.env.MANAGEMENT_APP_MEMBER_ID
+            delete process.env.MANAGEMENT_APP_PRIVATE_KEY
 
-            const headers = generateAuthorizationHeaders()
+            expect(() => assertRequiredEnv()).toThrow(
+                'Missing required environment variable(s): MANAGEMENT_APP_API_URL, MANAGEMENT_APP_MEMBER_ID, MANAGEMENT_APP_PRIVATE_KEY',
+            )
+        })
 
-            expect(headers).toEqual({
-                Authorization: 'Bearer ',
-            })
+        it('should pass when all are set', () => {
+            process.env.MANAGEMENT_APP_API_URL = 'https://bma'
+            process.env.MANAGEMENT_APP_MEMBER_ID = 'member-id'
+            process.env.MANAGEMENT_APP_PRIVATE_KEY = 'private-key'
+
+            expect(() => assertRequiredEnv()).not.toThrow()
         })
     })
 

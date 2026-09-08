@@ -1,4 +1,4 @@
-import { generateAuthorizationHeaders, log } from './utils'
+import { generateAuthorizationHeaders, log, requiredEnv } from './utils'
 import { type SerializedBuffer } from 'si-encryption/util'
 
 export type ManagementAppPublicKey = {
@@ -8,7 +8,7 @@ export type ManagementAppPublicKey = {
 }
 
 export const getPublicKeys = async (jobId: string): Promise<{ keys: ManagementAppPublicKey[] } | undefined> => {
-    const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}/keys`
+    const endpoint = `${requiredEnv('MANAGEMENT_APP_API_URL')}/api/job/${jobId}/keys`
     const headers = generateAuthorizationHeaders()
 
     log(`BMA: Retrieving public keys for job ID: ${jobId}`)
@@ -38,7 +38,7 @@ export const uploadResults = async (
     const data = Buffer.isBuffer(results) ? new Uint8Array(results) : results
     formData.append(fileType, new File([data], jobId, { type: type }))
 
-    const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}/results`
+    const endpoint = `${requiredEnv('MANAGEMENT_APP_API_URL')}/api/job/${jobId}/results`
     log(`BMA: Uploading results ${endpoint}`)
     const response = await fetch(endpoint, {
         method: 'POST',

@@ -2,7 +2,7 @@ import http from 'node:http'
 import { Router } from '@/http/router'
 import { toWebRequest, sendWebResponse, requestUrl, PayloadTooLargeError } from '@/http/adapter'
 import { json } from '@/http/json'
-import { isValidUUID, log } from '@/lib/utils'
+import { assertRequiredEnv, isValidUUID, log } from '@/lib/utils'
 import { health } from '@/routes/health'
 import { updateJobStatus } from '@/routes/job-status'
 import { uploadLogs } from '@/routes/logs'
@@ -48,5 +48,6 @@ export const server = http.createServer(async (req, res) => {
 const PORT = Number(process.env.PORT ?? 3002)
 
 if (process.env.NODE_ENV !== 'test') {
+    assertRequiredEnv()
     server.listen(PORT, () => log(`Trusted Output App listening on port ${PORT}`))
 }
