@@ -1,7 +1,22 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
-export const toWebRequest = async (req: IncomingMessage): Promise<Request> => {
-    const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`)
+export const MAX_UPLOAD_BYTES = 100 * 1024 * 1024
+
+export class PayloadTooLargeError extends Error {
+    constructor(limit: number) {
+        super(`Request body exceeds the ${limit} byte limit`)
+        this.name = 'PayloadTooLargeError'
+    }
+}
+
+export const requestUrl = (req: IncomingMessage): URL =>
+    new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`)
+
+export const toWebRequest = async (
+    req: IncomingMessage,
+    url: URL = requestUrl(req),
+    maxBytes: number = MAX_UPLOAD_BYTES,
+): Promise<Request> => {
     const method = req.method ?? 'GET'
 
     const headers = new Headers()
@@ -16,8 +31,20 @@ export const toWebRequest = async (req: IncomingMessage): Promise<Request> => {
 
     let body: Uint8Array<ArrayBuffer> | undefined
     if (method !== 'GET' && method !== 'HEAD') {
+        const declared = Number(req.headers['content-length'])
+        if (Number.isFinite(declared) && declared > maxBytes) {
+            throw new PayloadTooLargeError(maxBytes)
+        }
+
         const chunks: Buffer[] = []
+        let received = 0
+        // Counting as we read covers chunked bodies, which carry no Content-Length, and
+        // bodies whose declared length understates what is actually sent.
         for await (const chunk of req) {
+            received += (chunk as Buffer).byteLength
+            if (received > maxBytes) {
+                throw new PayloadTooLargeError(maxBytes)
+            }
             chunks.push(chunk as Buffer)
         }
         if (chunks.length > 0) {
