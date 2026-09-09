@@ -31,7 +31,7 @@
         "@types/debug": "^4.1.12",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^26.1.0",
-        "@vitest/coverage-v8": "^4.1.0",
+        "@vitest/coverage-v8": "*",
         "esbuild": "^0.28.1",
         "eslint": "^9",
         "eslint-config-prettier": "*",
@@ -47,7 +47,7 @@
     },
     "dependencies": {
         "jsonwebtoken": "^9.0.3",
-        "si-encryption": "github:safeinsights/encryption",
+        "si-encryption": "github:safeinsights/encryption#3cb802df301d02813f8f67261c34144686b8540a",
         "uuid": "^13.0.0"
     }
 }
