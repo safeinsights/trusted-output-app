@@ -37,6 +37,7 @@ export const server = http.createServer(async (req, res) => {
         if (error instanceof PayloadTooLargeError) {
             log(error.message, 'error')
             await sendWebResponse(res, json({ error: error.message }, 413))
+            req.destroy()
             return
         }
         log('Unhandled error handling request', 'error', error as Error)
