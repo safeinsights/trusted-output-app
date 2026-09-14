@@ -34,14 +34,14 @@ describe('server (integration)', () => {
         expect(await res.json()).toEqual({ error: 'Not found' })
     })
 
-    it('malformed JSON body returns 500 via the top-level catch', async () => {
+    it('malformed JSON body returns 400 rather than falling through to the top-level catch', async () => {
         const res = await fetch(`${baseUrl}/api/job/${uuidv4()}`, {
             method: 'PUT',
             headers: { 'content-type': 'application/json' },
             body: 'this is not json',
         })
-        expect(res.status).toBe(500)
-        expect(await res.json()).toEqual({ error: 'Internal server error' })
+        expect(res.status).toBe(400)
+        expect(await res.json()).toEqual({ error: 'Request body is not valid JSON' })
     })
 
     it('POST /api/job/:jobId/upload encrypts a real multipart file end-to-end', async () => {

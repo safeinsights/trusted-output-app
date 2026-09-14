@@ -53,7 +53,12 @@ export const updateJobStatus: RouteHandler = async (request, params) => {
         return json({ error: 'jobId is not a UUID' }, 400)
     }
 
-    const requestData = await request.json()
+    let requestData: unknown
+    try {
+        requestData = await request.json()
+    } catch {
+        return json({ error: 'Request body is not valid JSON' }, 400)
+    }
 
     if (!isJobStatusUpdateRequest(requestData)) {
         return json({ error: 'Malformed request data' }, 400)
