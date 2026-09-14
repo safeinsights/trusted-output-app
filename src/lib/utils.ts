@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { validate as uuidValidate } from 'uuid'
 
-const REQUIRED_ENV_VARS = ['MANAGEMENT_APP_API_URL', 'MANAGEMENT_APP_MEMBER_ID', 'MANAGEMENT_APP_PRIVATE_KEY'] as const
+export const REQUIRED_ENV_VARS = [
+    'MANAGEMENT_APP_API_URL',
+    'MANAGEMENT_APP_MEMBER_ID',
+    'MANAGEMENT_APP_PRIVATE_KEY',
+] as const
 
 const isSet = (value: string | undefined): value is string => Boolean(value)
 
