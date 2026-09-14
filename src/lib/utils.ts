@@ -3,18 +3,23 @@ import { validate as uuidValidate } from 'uuid'
 
 const REQUIRED_ENV_VARS = ['MANAGEMENT_APP_API_URL', 'MANAGEMENT_APP_MEMBER_ID', 'MANAGEMENT_APP_PRIVATE_KEY'] as const
 
+const isSet = (value: string | undefined): value is string => Boolean(value)
+
+const missingEnvError = (missing: readonly string[]): Error =>
+    new Error(`Missing required environment variable${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}`)
+
 export const requiredEnv = (name: (typeof REQUIRED_ENV_VARS)[number]): string => {
     const value = process.env[name]
-    if (!value) {
-        throw new Error(`Missing required environment variable: ${name}`)
+    if (!isSet(value)) {
+        throw missingEnvError([name])
     }
     return value
 }
 
 export const assertRequiredEnv = (): void => {
-    const missing = REQUIRED_ENV_VARS.filter((name) => !process.env[name])
+    const missing = REQUIRED_ENV_VARS.filter((name) => !isSet(process.env[name]))
     if (missing.length > 0) {
-        throw new Error(`Missing required environment variable(s): ${missing.join(', ')}`)
+        throw missingEnvError(missing)
     }
 }
 

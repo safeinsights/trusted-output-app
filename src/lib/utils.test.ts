@@ -53,7 +53,7 @@ describe('Utils', () => {
             delete process.env.MANAGEMENT_APP_PRIVATE_KEY
 
             expect(() => assertRequiredEnv()).toThrow(
-                'Missing required environment variable(s): MANAGEMENT_APP_API_URL, MANAGEMENT_APP_MEMBER_ID, MANAGEMENT_APP_PRIVATE_KEY',
+                'Missing required environment variables: MANAGEMENT_APP_API_URL, MANAGEMENT_APP_MEMBER_ID, MANAGEMENT_APP_PRIVATE_KEY',
             )
         })
 
