@@ -1,6 +1,11 @@
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { getPublicKeys, uploadResults } from './management-app-requests'
 
+vi.mock('./utils', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('./utils')>()),
+    generateAuthorizationHeaders: () => ({ Authorization: 'Bearer tokenvalue' }),
+}))
+
 describe('getPublicKeys', () => {
     beforeEach(() => {
         process.env.MANAGEMENT_APP_API_URL = 'https://bma'

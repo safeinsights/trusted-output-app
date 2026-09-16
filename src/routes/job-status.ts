@@ -1,6 +1,6 @@
 import { json } from '@/http/json'
 import type { RouteHandler } from '@/http/router'
-import { generateAuthorizationHeaders, isValidUUID } from '@/lib/utils'
+import { generateAuthorizationHeaders, isValidUUID, requiredEnv } from '@/lib/utils'
 
 enum AllowedStatusUpdates {
     JOB_PROVISIONING = 'JOB-PROVISIONING',
@@ -64,7 +64,7 @@ export const updateJobStatus: RouteHandler = async (request, params) => {
         return json({ error: 'Malformed request data' }, 400)
     }
 
-    const endpoint = `${process.env.MANAGEMENT_APP_API_URL}/api/job/${jobId}`
+    const endpoint = `${requiredEnv('MANAGEMENT_APP_API_URL')}/api/job/${jobId}`
     const response = await fetch(endpoint, {
         method: 'PUT',
         body: JSON.stringify(requestData),
