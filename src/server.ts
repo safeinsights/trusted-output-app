@@ -8,6 +8,8 @@ import { updateJobStatus } from '@/routes/job-status'
 import { uploadLogs } from '@/routes/logs'
 import { uploadResultFiles } from '@/routes/upload'
 
+const LINGER_MS = 1_000
+
 export const router = new Router()
 router.register('GET', '/api/health', health)
 router.register('PUT', '/api/job/:jobId', updateJobStatus)
@@ -36,6 +38,15 @@ export const server = http.createServer(async (req, res) => {
     } catch (error) {
         if (error instanceof PayloadTooLargeError) {
             log(error.message, 'error')
+            // Closing on a client that is still uploading resets the connection, and the RST
+            // discards the 413 before it is read. Drain what is in flight instead, then close.
+            const socket = res.socket
+            res.on('finish', () => {
+                if (!socket) return
+                socket.resume()
+                socket.end()
+                setTimeout(() => socket.destroy(), LINGER_MS).unref()
+            })
             await sendWebResponse(res, json({ error: error.message }, 413))
             return
         }

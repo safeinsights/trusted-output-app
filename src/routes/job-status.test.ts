@@ -32,6 +32,32 @@ describe('PUT /api/job/:jobId', () => {
         expect(mockBMAResponse).not.toHaveBeenCalled()
     })
 
+    it('should return 400 without contacting the BMA if the body is not valid JSON', async () => {
+        const mockBMAResponse = vi.fn()
+        vi.stubGlobal('fetch', mockBMAResponse)
+        process.env.MANAGEMENT_APP_API_URL = 'http://bma'
+
+        const req = new Request('http://localhost', { method: 'PUT', body: 'not json' })
+        const res = await updateJobStatus(req, { jobId })
+
+        expect(res.status).toBe(400)
+        expect(await res.json()).toEqual({ error: 'Request body is not valid JSON' })
+        expect(mockBMAResponse).not.toHaveBeenCalled()
+    })
+
+    it('should return 400 without contacting the BMA if the body is empty', async () => {
+        const mockBMAResponse = vi.fn()
+        vi.stubGlobal('fetch', mockBMAResponse)
+        process.env.MANAGEMENT_APP_API_URL = 'http://bma'
+
+        const req = new Request('http://localhost', { method: 'PUT' })
+        const res = await updateJobStatus(req, { jobId })
+
+        expect(res.status).toBe(400)
+        expect(await res.json()).toEqual({ error: 'Request body is not valid JSON' })
+        expect(mockBMAResponse).not.toHaveBeenCalled()
+    })
+
     it('should return 400 if JSON data is not of expected shape', async () => {
         const params = { jobId }
 
