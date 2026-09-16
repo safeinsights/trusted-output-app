@@ -1,15 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { Readable } from 'node:stream'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { toWebRequest, sendWebResponse } from './adapter'
+import { toWebRequest, sendWebResponse, MAX_UPLOAD_BYTES, PayloadTooLargeError } from './adapter'
 
 const fakeReq = (opts: {
     method: string
     url: string
     headers: Record<string, string | string[] | undefined>
     body?: string
+    chunks?: string[]
 }): IncomingMessage => {
-    const stream = Readable.from(opts.body ? [Buffer.from(opts.body)] : [])
+    const chunks = opts.chunks ?? (opts.body ? [opts.body] : [])
+    const stream = Readable.from(chunks.map((chunk) => Buffer.from(chunk)))
     return Object.assign(stream, {
         method: opts.method,
         url: opts.url,
@@ -44,6 +46,42 @@ describe('toWebRequest', () => {
 
         expect(webReq.method).toBe('GET')
         expect(webReq.body).toBeNull()
+    })
+})
+
+describe('toWebRequest body limits', () => {
+    it('rejects a declared Content-Length over the limit without reading the body', async () => {
+        const req = fakeReq({
+            method: 'POST',
+            url: '/api/job/abc/upload',
+            headers: { host: 'localhost', 'content-length': String(MAX_UPLOAD_BYTES + 1) },
+            body: 'a token amount, since the declared length is what gets rejected',
+        })
+
+        await expect(toWebRequest(req)).rejects.toThrow(`Request body exceeds the ${MAX_UPLOAD_BYTES} byte limit`)
+        expect(req.readableDidRead).toBe(false)
+    })
+
+    it('rejects a chunked body that exceeds the limit while reading', async () => {
+        const req = fakeReq({
+            method: 'POST',
+            url: '/api/job/abc/upload',
+            headers: { host: 'localhost', 'transfer-encoding': 'chunked' },
+            chunks: ['12345', '67890', 'overflow'],
+        })
+
+        await expect(toWebRequest(req, undefined, 10)).rejects.toThrow(PayloadTooLargeError)
+    })
+
+    it('accepts a body at the limit', async () => {
+        const req = fakeReq({
+            method: 'POST',
+            url: '/api/job/abc/upload',
+            headers: { host: 'localhost', 'content-length': '10' },
+            body: '0123456789',
+        })
+
+        expect(await (await toWebRequest(req, undefined, 10)).text()).toBe('0123456789')
     })
 })
 
