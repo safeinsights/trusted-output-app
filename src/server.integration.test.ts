@@ -43,6 +43,43 @@ describe('server (integration)', () => {
             req.flushHeaders()
         })
 
+    // Keeps uploading until the server answers, so body bytes are still in flight when the
+    // 413 is written. Resolves once the server also closes the connection.
+    const postStreamingBody = (path: string, declaredBytes?: number) =>
+        new Promise<{ status: number; body: string; hungUp: boolean }>((resolve, reject) => {
+            let streaming = true
+            let responded = false
+            const headers = declaredBytes ? { 'content-length': String(declaredBytes) } : {}
+            const req = http.request(`${baseUrl}${path}`, { method: 'POST', headers }, (res) => {
+                streaming = false
+                responded = true
+                let body = ''
+                res.on('data', (chunk) => (body += chunk))
+                res.on('end', () => {
+                    const socket = res.socket
+                    const settle = (hungUp: boolean) => {
+                        clearTimeout(timer)
+                        req.destroy()
+                        resolve({ status: res.statusCode ?? 0, body, hungUp })
+                    }
+                    const timer = setTimeout(() => settle(false), 2000)
+                    if (!socket || socket.destroyed) settle(true)
+                    else socket.once('close', () => settle(true))
+                })
+            })
+            // A write can fail once the server hangs up; that is fine as long as the 413 arrived.
+            req.on('error', (err) => {
+                if (!responded) reject(err)
+            })
+            const chunk = Buffer.alloc(1024 * 1024)
+            const pump = () => {
+                if (!streaming) return
+                if (req.write(chunk)) setImmediate(pump)
+                else req.once('drain', pump)
+            }
+            pump()
+        })
+
     it('GET /api/health returns ok', async () => {
         const res = await fetch(`${baseUrl}/api/health`)
         expect(res.status).toBe(200)
@@ -70,6 +107,22 @@ describe('server (integration)', () => {
 
         expect(res.status).toBe(413)
         expect(JSON.parse(res.body).error).toMatch(new RegExp(`exceeds the ${MAX_UPLOAD_BYTES} byte limit`))
+    })
+
+    it('delivers the 413 to a client streaming an oversized body, then hangs up', async () => {
+        const res = await postStreamingBody(`/api/job/${uuidv4()}/upload`)
+
+        expect(res.status).toBe(413)
+        expect(JSON.parse(res.body).error).toMatch(new RegExp(`exceeds the ${MAX_UPLOAD_BYTES} byte limit`))
+        expect(res.hungUp).toBe(true)
+    })
+
+    it('delivers the 413 to a client uploading against an oversized Content-Length', async () => {
+        const res = await postStreamingBody(`/api/job/${uuidv4()}/upload`, MAX_UPLOAD_BYTES + 1)
+
+        expect(res.status).toBe(413)
+        expect(JSON.parse(res.body).error).toMatch(new RegExp(`exceeds the ${MAX_UPLOAD_BYTES} byte limit`))
+        expect(res.hungUp).toBe(true)
     })
 
     it('rejects an invalid jobId with 400 before the body is buffered', async () => {
