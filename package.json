@@ -9,9 +9,9 @@
         "pnpm": ">=11"
     },
     "scripts": {
-        "dev": "next dev --turbopack -p 3002",
-        "build": "unset NODE_ENV && next build",
-        "start": "next start -p 3002",
+        "dev": "tsx watch src/index.ts",
+        "build": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=bundle --outfile=dist/server.mjs",
+        "start": "node dist/server.mjs",
         "docker:build": "docker build --platform=linux/amd64 -t trusted-output-app .",
         "lint": "eslint . && prettier --check .",
         "lint:fix": "eslint --fix . && prettier --write .",
@@ -28,31 +28,27 @@
     },
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
-        "@next/eslint-plugin-next": "^16.1.6",
-        "@types/debug": "^4.1.12",
+        "@eslint/js": "^9",
         "@types/jsonwebtoken": "^9.0.10",
-        "@types/react": "^19.2.14",
-        "@vitejs/plugin-react": "^6.0.1",
+        "@types/node": "^22",
         "@vitest/coverage-v8": "^4.1.0",
+        "esbuild": "^0.25.0",
         "eslint": "^9",
-        "eslint-config-next": "^16.1.6",
         "eslint-config-prettier": "*",
         "eslint-plugin-anti-trojan-source": "^1.1.4",
-        "happy-dom": "*",
+        "globals": "^17.6.0",
         "husky": "^9.1.7",
         "lint-staged": "^17.0.5",
         "prettier": "*",
+        "tsx": "^4.20.4",
         "typescript": "^5.9.3",
+        "typescript-eslint": "^8.49.0",
         "vite-tsconfig-paths": "^6.1.1",
         "vitest": "*"
     },
     "dependencies": {
         "jsonwebtoken": "^9.0.3",
-        "multer": "^2.1.1",
-        "next": "^16.1.6",
-        "react": "^19.2.4",
-        "react-dom": "^19.2.4",
-        "si-encryption": "github:safeinsights/encryption",
+        "si-encryption": "workspace:*",
         "uuid": "^13.0.0"
     }
 }

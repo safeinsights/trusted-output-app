@@ -21,7 +21,7 @@ node_modules/
 .eslintcache
 
 # Build outputs
-.next/
+dist/
 coverage/
 
 # Test results

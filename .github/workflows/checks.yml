@@ -13,6 +13,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
+              with:
+                  # si-encryption is a private submodule; the default GITHUB_TOKEN cannot read
+                  # another private repo, so supply a PAT/App token with read access to it.
+                  submodules: recursive
+                  token: ${{ secrets.SI_ENCRYPTION_PAT }}
             - uses: pnpm/action-setup@v6
             - uses: actions/setup-node@v6
               with:
@@ -55,3 +60,13 @@ jobs:
               run: pnpm run test
             - name: Test build
               run: pnpm run build
+            - name: Smoke test (server boots and serves /api/health)
+              run: |
+                  pnpm run start &
+                  SERVER_PID=$!
+                  for i in $(seq 1 30); do
+                      if curl -fs http://localhost:3002/api/health; then break; fi
+                      sleep 1
+                  done
+                  curl -fs http://localhost:3002/api/health | grep -q '"status":"ok"'
+                  kill $SERVER_PID
