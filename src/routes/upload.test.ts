@@ -77,7 +77,11 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
             pemToArrayBuffer(keyPair.privateKeyString),
             keyPair.fingerprint,
         )
-        return reader.extractFiles()
+        const files = await reader.extractFiles()
+        // Asserted on every upload path: the management app refuses an archive that names another
+        // job, so a missing binding breaks reviewer decryption rather than anything visible here.
+        expect(reader.manifest.jobId).toBe(mockJobId)
+        return files
     }
 
     const requestWith = (formData: FormData) => ({ formData: async () => formData }) as unknown as Request
