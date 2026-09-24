@@ -47,7 +47,7 @@
     },
     "dependencies": {
         "jsonwebtoken": "^9.0.3",
-        "si-encryption": "github:safeinsights/encryption#3cb802df301d02813f8f67261c34144686b8540a",
+        "si-encryption": "github:safeinsights/encryption#a9b68887be485c1e569cbc71908d67a9426d50b5",
         "uuid": "^13.0.0"
     }
 }
