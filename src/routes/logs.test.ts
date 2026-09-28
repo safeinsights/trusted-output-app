@@ -124,6 +124,7 @@ describe('POST /api/job/[jobId]/logs with public keys', async () => {
         )
 
         const uploadedFiles = await reader.extractFiles()
+        expect(reader.manifest.jobId).toBe(mockJobId)
         expect(uploadedFiles).toHaveLength(1)
         expect(uploadedFiles[0].path).toEqual('logs.json')
         expect(new TextDecoder().decode(uploadedFiles[0].contents)).toEqual(jsonPayload)
@@ -147,6 +148,7 @@ describe('POST /api/job/[jobId]/logs with public keys', async () => {
         )
 
         const uploadedFiles = await reader.extractFiles()
+        expect(reader.manifest.jobId).toBe(mockJobId)
         expect(uploadedFiles).toHaveLength(1)
         expect(uploadedFiles[0].path).toEqual('logs.txt')
         expect(new TextDecoder().decode(uploadedFiles[0].contents)).toEqual(textPayload)

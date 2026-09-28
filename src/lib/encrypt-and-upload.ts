@@ -75,7 +75,7 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig): Rout
         }
 
         log(`Encrypting ${label} with public keys ...`)
-        const encrypted = await encryptResults(files, publicKeys.keys)
+        const encrypted = await encryptResults(files, publicKeys.keys, jobId)
         const response = await uploadResults(jobId, encrypted, 'application/zip', fileType)
 
         if (!response.ok) {
