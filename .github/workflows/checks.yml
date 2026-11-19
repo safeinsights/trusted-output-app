@@ -37,21 +37,17 @@ jobs:
                   severity: 'HIGH,CRITICAL'
                   exit-code: '1'
                   trivyignores: '.trivyignore.yaml'
-            - name: Run SonarQube SAST Scan
-              uses: SonarSource/sonarqube-scan-action@v6
-              env:
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-            # If you wish to fail your job when the Quality Gate is red, uncomment the
-            # following lines. This would typically be used to fail a deployment.
-            # - name: Check SonarQube SAST Sca
-            #   uses: SonarSource/sonarqube-quality-gate-action@v1
-            #   timeout-minutes: 5
-            #   env:
-            #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             - name: Typecheck
               run: pnpm run typecheck
             - name: Unit Test
               run: pnpm run test
             - name: Test build
               run: pnpm run build
+
+    # SAST with Semgrep CE from ci-workflows; findings at ERROR fail the job.
+    # `pull-requests: write` is only for the report comment.
+    semgrep:
+        permissions:
+            contents: read
+            pull-requests: write
+        uses: safeinsights/ci-workflows/.github/workflows/semgrep.yaml@1e3e7f0a9fd39fa71bccf5aaa7c802464071bc9c # v4.1.0
