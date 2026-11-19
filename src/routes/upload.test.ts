@@ -122,54 +122,41 @@ describe('POST /api/job/[jobId]/upload with public keys', () => {
         expect(new TextDecoder().decode(uploadedFiles[0].contents)).toEqual('id,name\n1,John')
     })
 
-    it('should encrypt multiple files sent under the repeated file field', async () => {
-        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
-
+    it('should reject more than one file sent under the repeated file field', async () => {
         const formData = new FormData()
         formData.append('file', new File(['id,name\n1,John'], 'results_a.csv', { type: 'text/csv' }))
         formData.append('file', new File(['col1,col2\nx,y'], 'results_b.csv', { type: 'text/csv' }))
 
         const response = await uploadResultFiles(requestWith(formData), { jobId: mockJobId })
 
-        expect(mgmt.uploadResults).toHaveBeenCalledWith(mockJobId, expect.any(Blob), 'application/zip', 'result')
-        expect(response.status).toBe(200)
-
-        const uploadedFiles = await decrypt()
-        expect(uploadedFiles).toHaveLength(2)
-        expect(uploadedFiles.find((f) => f.path === 'results_a.csv')).toBeDefined()
-        expect(uploadedFiles.find((f) => f.path === 'results_b.csv')).toBeDefined()
+        expect(response.status).toBe(400)
+        expect((await response.json()).error).toBe('Only one result file can be uploaded, received 2')
+        expect(mgmt.uploadResults).not.toHaveBeenCalled()
     })
 
-    it('should accept files sent under file and file2 fields', async () => {
-        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
-
-        const formData = new FormData()
-        formData.append('file', new File(['id,name\n1,John'], 'a.csv', { type: 'text/csv' }))
-        formData.append('file2', new File(['col1,col2\nx,y'], 'b.csv', { type: 'text/csv' }))
-
-        const response = await uploadResultFiles(requestWith(formData), { jobId: mockJobId })
-
-        expect(response.status).toBe(200)
-        const uploadedFiles = await decrypt()
-        expect(uploadedFiles).toHaveLength(2)
-        expect(uploadedFiles.find((f) => f.path === 'a.csv')).toBeDefined()
-        expect(uploadedFiles.find((f) => f.path === 'b.csv')).toBeDefined()
-    })
-
-    it('should accept files sent under arbitrary field names (file1, file2)', async () => {
-        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
-
+    it('should reject more than one file sent under different field names', async () => {
         const formData = new FormData()
         formData.append('file1', new File(['one'], 'one.csv', { type: 'text/csv' }))
         formData.append('file2', new File(['two'], 'two.csv', { type: 'text/csv' }))
 
         const response = await uploadResultFiles(requestWith(formData), { jobId: mockJobId })
 
+        expect(response.status).toBe(400)
+        expect(mgmt.uploadResults).not.toHaveBeenCalled()
+    })
+
+    it('should accept a single file sent under another field name', async () => {
+        vi.mocked(mgmt.uploadResults).mockResolvedValue({ ok: true } as Response)
+
+        const formData = new FormData()
+        formData.append('results', new File(['data'], 'results.zip', { type: 'application/zip' }))
+
+        const response = await uploadResultFiles(requestWith(formData), { jobId: mockJobId })
+
         expect(response.status).toBe(200)
         const uploadedFiles = await decrypt()
-        expect(uploadedFiles).toHaveLength(2)
-        expect(uploadedFiles.find((f) => f.path === 'one.csv')).toBeDefined()
-        expect(uploadedFiles.find((f) => f.path === 'two.csv')).toBeDefined()
+        expect(uploadedFiles).toHaveLength(1)
+        expect(uploadedFiles[0].path).toEqual('results.zip')
     })
 
     it('should ignore non-file string fields', async () => {
