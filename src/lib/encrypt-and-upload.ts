@@ -66,6 +66,12 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig): Rout
             return json({ error: msg }, 400)
         }
 
+        if (files.length > 1) {
+            const msg = `Only one ${fileType} file can be uploaded, received ${files.length}`
+            log(msg, 'error')
+            return json({ error: msg }, 400)
+        }
+
         const publicKeys = ensureValue(await getPublicKeys(jobId))
 
         if (publicKeys.keys.length === 0) {
@@ -75,7 +81,7 @@ export const createEncryptAndUploadHandler = (config: UploadHandlerConfig): Rout
         }
 
         log(`Encrypting ${label} with public keys ...`)
-        const encrypted = await encryptResults(files, publicKeys.keys, jobId)
+        const encrypted = await encryptResults(files[0], publicKeys.keys, jobId)
         const response = await uploadResults(jobId, encrypted, 'application/zip', fileType)
 
         if (!response.ok) {

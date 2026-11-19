@@ -5,7 +5,7 @@ import { ResultsWriter } from 'si-encryption/job-results/writer'
 export type EncryptableFile = { name: string; data: ArrayBuffer }
 
 export const encryptResults = async (
-    files: EncryptableFile[],
+    file: EncryptableFile,
     publicKeys: ManagementAppPublicKey[],
     jobId: string,
 ): Promise<Blob> => {
@@ -14,9 +14,7 @@ export const encryptResults = async (
     })
     const writer = new ResultsWriter(writerParams, { jobId })
 
-    for (const file of files) {
-        await writer.addFile(file.name, file.data)
-    }
+    await writer.addFile(file.name, file.data)
 
     const encryptedResults: Blob = await writer.generate()
     return encryptedResults
